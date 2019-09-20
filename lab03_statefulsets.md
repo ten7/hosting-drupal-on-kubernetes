@@ -97,7 +97,7 @@ Like a Deployment, a Statefulset acts as a template that creates one or more pod
 
   statefulset.apps/mysql scaled
 ```
-10. List the pods again. Notice that they are removed, not randomly, but it an explicit reverse order, and only one at a time:
+11. List the pods again. Notice that they are removed, not randomly, but it an explicit reverse order, and only one at a time:
 ```shell
   $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods                            
 
