@@ -2,6 +2,12 @@
 
 Deployments fulfill most needs we have for running workloads on Kubernetes. Deployments, however, assume that each pod is temporary, replaceable, and arbitrarily scaleable. This is why pod names created from a Deployment each start with the Deployment name, but end in a random series of characters. Deployments are said to be "stateless" by default. Sometimes, however, we *do* need something stateful, such as a file server or a database. For that, we have Statefulsets.
 
+In this lab, we'll:
+* Create a Statefulset and Service for a MySQL database
+* Work with Statefulset-managed pods, and see how they differ from Deployment-managed pods.
+* Use a Volume Claim Template to provision a persistent volume with our Statefulset.
+* Test the operation of our database.
+
 ## Creating a Statefulset
 
 A Statefulset works like a Deployment in most cases. The only difference is in how it is provisioned and what capabilities are available to it. We can create Statefulsets using `kubectl`.
@@ -274,6 +280,70 @@ Like with Deployments, we also need to create a Service definition for our State
     selector:
       app: mysql
 ```
+3. When finished, your `mysql.yml` file should look like this:
+```yaml
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: mysql
+  spec:
+    selector:
+      matchLabels:
+        app: mysql
+    serviceName: mysql
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          app: mysql
+      spec:
+        initContainers:
+          - name: "fix-pvc-permissions"
+            image: "alpine:3.9"
+            command:
+              - "sh"
+              - "-c"
+              - "chown -R 1000:1000 /var/lib/mysql"
+            volumeMounts:
+              - mountPath: /var/lib/mysql
+                name: vol-mysql
+        containers:
+          - name: "db"
+            image: "ten7/flight-deck-db:develop"
+            ports:
+              - containerPort: 3306
+                name: mysql
+                protocol: TCP
+            volumeMounts:
+              - mountPath: /var/lib/mysql
+                name: vol-mysql
+        volumes:
+          - name: vol-mysql
+            persistentVolumeClaim:
+              claimName: mysql
+    volumeClaimTemplates:
+      - metadata:
+          name: vol-mysql
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: mysql
+  spec:
+    clusterIP: None
+    ports:
+      - name: mysql
+        port: 3306
+        protocol: TCP
+    selector:
+      app: mysql
+```
 3. Take special note of the `---`. This is necessary so that `kubectl` separates your Statefulset from your Service definition.
 4. Also note the `clusterIP` line. The `None` type is what makes this definition a headless service.
 5. Use `kubectl apply` to create the Service:
@@ -289,42 +359,16 @@ Like with Deployments, we also need to create a Service definition for our State
   web     LoadBalancer   10.245.178.180   104.248.104.157   80:30403/TCP   5h8m
 ```
 
-## Connecting to the database from the web pod
+## Install Drupal for real this time
 
-Now that we have a database backed by a persistent disk, we should be able to connect to it from our web pod. Our mysql pod by default creates a `drupal` database, with a `drupal` user. The password is `drupal` by default. Obviously we'll need to change this, but we'll do that in a future lab.
+Now that we have a database backed by a persistent disk, we should be able to connect to it from our web pod. Our mysql pod by default creates a `drupal` database, with a `drupal` user. The password is `drupal` by default. Obviously we'll need to change this, but we'll do that in a future lab. For now, let's install Drupal using the web UI:
 
-1. First, use `kubectl get pods` to get all the pods in your cluster.
-2. Note the name of the `web-` pod. Now, `exec` into it:
-```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" exec -it web-123456-abc /bin/bash
-```
-Where:
-  * **web-123456-abc** is the name of your web pod.
-3. Once inside the web pod, let's try to connect to MySQL remotely:
-```shell
-mysql -u drupal -p -h mysql-0
-```
-4. When prompted, enter the password as `drupal`:
-```shell
-  $ mysql -u drupal -p -h mysql-0
-  Enter password:
-
-  ERROR 2005 (HY000): Unknown MySQL server host 'mysql-0' (-2)
-```
-5. Huh. That isn't what we expected. That's because in Kubernetes, Statefulset pods have hostnames of the form *podName.StatefulsetName*. So:
-```shell
-  $ mysql -u drupal -p -h mysql-0.mysql
-  Enter password:
-
-  Welcome to the MariaDB monitor.  Commands end with ; or \g.
-  Your MariaDB connection id is 10
-  Server version: 10.3.17-MariaDB MariaDB Server
-
-  Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
-
-  Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-
-  MariaDB [(none)]>
-````
-
-Perfect! Now we have everything we need to install Drupal using MySQL if we want. The database name, username, and password, however, aren't very secure. We'll change that in future labs.
+1. Using a web browser, navigate to the IP address provided by the web portal.
+2. After a moment, you should be redirected to the Drupal installation page. Click `Save and Continue`.
+3. Continue through the installation process until you reach the **Database configuration** page.
+4. For the **Database type** select **MySQL**.
+5. For the **Database name** enter `drupal`.
+6. For the **Database username** enter `drupal`.
+7. For the **Database password** also enter `drupal`.
+8. Open the **Advanced options** fieldset. For the **Host**, enter `mysql-0.mysql`.
+9. Allow Drupal to install. On the **Configure site** page, enter any remaining options -- including an adminstrator password -- to complete the installation.

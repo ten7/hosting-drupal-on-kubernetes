@@ -194,18 +194,54 @@ We know Apache is running inside our container, but accessing it through a `kube
       app: web
 ```
 3. Take special note of the `---`. This separates our Deployment definition from our Service definition while keeping them in the same file for our convenience.
-4. Save, and re-`apply` the file to our cluster:
+4. When finished, your `web.yml` file should look like this:
+```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: web
+    name: web
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: web
+    template:
+      metadata:
+        labels:
+          app: web
+      spec:
+        containers:
+          - image: ten7/flight-deck-drupal:latest
+            name: web
+            ports:
+              - containerPort: 80
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: web
+  spec:
+    ports:
+      - name: http
+        port: 80
+        protocol: TCP
+    selector:
+      app: web
+```
+5. Save, and re-`apply` the file to our cluster:
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
-5. Like with Deployments, `kubectl` will validate the format of our Service prior to applying it to the cluster. If there are errors, go back and correct them and try to apply again.
-6. Once applied, we can list our services just as we did our deployments:
+6. Like with Deployments, `kubectl` will validate the format of our Service prior to applying it to the cluster. If there are errors, go back and correct them and try to apply again.
+7. Once applied, we can list our services just as we did our deployments:
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
   NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
   web    ClusterIP   10.245.46.160   <none>        80/TCP    3m13s
 ```
-7. Use `kubectl describe` to get further details on our service:
+8. Use `kubectl describe` to get further details on our service:
 ```shell
   $ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe service web
   Name:              web
