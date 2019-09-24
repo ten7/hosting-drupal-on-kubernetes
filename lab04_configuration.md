@@ -112,7 +112,8 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
 6. List the pods in the cluster. Notice that the pod(s) for your `web` deployment were recently recreated:
 ```shell
-kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+
 NAME                  READY   STATUS    RESTARTS   AGE
 mysql-0               1/1     Running   0          2d10h
 web-5ddcb78d8-p5lqb   1/1     Running   0          19m

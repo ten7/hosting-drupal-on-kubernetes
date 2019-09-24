@@ -176,6 +176,7 @@ $ curl localhost
     <body>
         Redirecting to <a href="/core/install.php">/core/install.php</a>.
     </body>
+</html>
 ```
 9. Finally, let's leave the pod and return to our local system:
 ```shell
@@ -246,7 +247,8 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 6. Like with Deployments, `kubectl` will validate the format of our Service prior to applying it to the cluster. If there are errors, go back and correct them and try to apply again.
 7. Once applied, we can list our services just as we did our deployments:
 ```shell
-kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
+
 NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 web    ClusterIP   10.245.46.160   <none>        80/TCP    3m13s
 ```
