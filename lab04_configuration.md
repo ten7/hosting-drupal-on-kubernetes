@@ -1,12 +1,14 @@
 # Configuration
 
-When working with pods in Kubernetes, there are three basic ways to manage configuration:
-
-* Build the configuration into the pod's image
-* Use Environment Variables
-* Mount configuration files when the pod starts
+When working with pods in Kubernetes, there are three basic ways to manage configuration. We could build the configuration into the pod's image, but this is limiting and results in shared credentials. We could use Docker Compose-style envrionment variables, but this is insecure. The last option is to mount configuration files when the pod starts. This is the most complex option, but it offers acceptable security with broad and straightforward support.
 
 It's this latter method that Kubernetes uses to manage and provide configuration. This is accomplished through *Secrets* and *ConfigMaps*.
+
+In this lab we'll:
+
+* Create Secrets and Configmaps.
+* Update our Deployment and Statefulset to use them.
+* Observe how applying Secrets and Configmaps affects pod availability.
 
 ## Create secret for database credentials
 
@@ -27,7 +29,7 @@ Secrets aren't considered a part of a Deployment or a Statefulset. They are thei
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/secrets.yml
 ```
-4. Although our `secrets.yml` file is pretty simple, it's still subject to the same validation as are Deployments, Services, and Statefulsets. If there are errors, go back and correct them.
+4. Although our `secrets.yml` file is pretty simple, it's still subject to the same validation as are Deployments, Services, and Statefulsets. If there are errors, go back and correct them, then, reapply the file.
 5. List all the secrets on the cluster:
 ```shell
   $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get secrets
@@ -47,7 +49,7 @@ Secrets aren't considered a part of a Deployment or a Statefulset. They are thei
 With our Secret created, let's put it to use on our web deployment.
 
 1. Using a text editor, open the `web.yml` file you created earlier in the class.
-2. Update the `Deployment` definition. Add the `volumes` section. It should be at the indent level as `containers`:
+2. Update the `Deployment` definition to add the `volumes` section. It should be at the indent level as `containers`:
 ```yaml
   volumes:
     - name: "vol-drupal-db"
@@ -104,11 +106,11 @@ With our Secret created, let's put it to use on our web deployment.
       app: web
     type: LoadBalancer
 ```
-5. With that complete, apply the updated deployment to the cluster:
+5. Save the file, then apply the updated deployment to the cluster:
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
-6. List the pods in the cluster. Notice that the pod(s) for your `web` deployment were recently restarted:
+6. List the pods in the cluster. Notice that the pod(s) for your `web` deployment were recently recreated:
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
   NAME                  READY   STATUS    RESTARTS   AGE
@@ -118,7 +120,7 @@ With our Secret created, let's put it to use on our web deployment.
 
 ## Examine files
 
-Instead of mounting the secret into the existing pod, Kubernetes will recreate new pods instead. This is intentional. Even Statefulset pods should be designed to survive a pod being deleted and recreated. Let's examine the new web pod to see how our Secret is presented inside the pod:
+At first, recreatng the pods seems like an excessive response to a configuration change. Yet, this is an intentional behavior. Pods are meant to be emphemeral. Even Statefulset pods should be designed to survive a pod being deleted and recreated. Let's examine the new web pod to see how our Secret is presented inside the pod:
 
 1. Examine the `web.yml` file. Notice that under `volumeMounts`, we mounted the secret under `/config/drupal-db`.
 2. Return to the List the pods in your cluster:
@@ -150,7 +152,7 @@ drupal-db-password.txt
 
 Typically, Secrets are used for highly secure credentials such as passwords and API keys, rather than to store entire configuration files. For the latter case, Kubernetes offers *Configmaps*. A Configmap represents one or more files inside a single directory. They aren't subject to the 1Mb size limitation or base64 encoding of Secrets, but they aren't encrypted either. Configmaps are created using `kubectl`.
 
-Our database container, `ten7/flight-deck-db:develop`, is built to [expect a config map](https://github.com/ten7/flight-deck-db/blob/develop/README.md) to create users, databases, and more. Let's create a minimal Configmap to configure the `mysql` Statefulset:
+Our database container, `ten7/flight-deck-db:develop`, is built to [expect a YAML file](https://github.com/ten7/flight-deck-db/blob/develop/README.md) to create users, databases, and more. Let's create a minimal Configmap to provide that file to the `mysql` Statefulset:
 
 1. Using a text editor, create a new file `configmaps.yml`.
 2. Edit the file to be the following:
@@ -169,8 +171,8 @@ Our database container, `ten7/flight-deck-db:develop`, is built to [expect a con
         passwordFile: "/config/drupal-db/drupal-db-password.txt"
         priv: "drupal.*:ALL"
 ```
-3. Notice that like Secrets, a Configmap can container multiple files, each is an item under the `data` list.
-4. Apply the file to the cluster:
+3. Notice that like Secrets, a Configmap can host multiple files, each is an item under the `data` list.
+4. Apply the `configmaps.yml` file to the cluster:
 ```shell
   kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
 ```
@@ -193,7 +195,7 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql
 Mounting a Configmap inside a Statefulset is the largely the same process as adding a Secret to a Deployment:
 
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
-2. Update the `Statefulset` definition. Add the following under the `volumes` section:
+2. Update the `Statefulset` definition to add the following under the `volumes` section:
 ```yaml
   - name: "vol-flightdeck-db"
     configMap:
@@ -208,7 +210,7 @@ Mounting a Configmap inside a Statefulset is the largely the same process as add
 
 ## Reusing secrets
 
-Notice that when we created the configmap, we didn't actually put the password for the database in the file. That's because the `ten7/flight-deck-db:develop` container can be instructed to look for the password in another file using `passwordFile`. Since we already have the password in a Secret, we we're going to use the same one we created for our `web` deployment.
+Notice that when we created the Configmap, we didn't actually put the password for the database in the file. That's because the `ten7/flight-deck-db:develop` container can be instructed to look for the password in another file using `passwordFile`. Since we already have the password in a Secret, we we're going to use the same one we created for our `web` deployment.
 
 
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
@@ -320,14 +322,14 @@ Notice that when we created the configmap, we didn't actually put the password f
 
 ## Configuring the web container
 
-When we installed Drupal earlier, the Drupal installer altered the `settings.php` file to include the database login we gave it. Now, however, we have two new problems. Applying the Secret to the web Deployment caused the container to be recreated, which lost our changes to `settings.php`. Furthermore, we also changed the password to the database. Now we need to fix both.
+When we installed Drupal earlier, a new `settings.php` was generated to host configurations for the site. This includes the database credentials. Now, however, we have two new problems. Applying the Secret to the web Deployment caused the container to be recreated. With no persistent volume attached to the web pod, the `settings.php` file was lost. We also changed the database password, and now we need to fix both issues.
 
-Fortunately, our `ten7/flight-deck-drupal:latest` container also accepts a Configmap, and will automatically update settings.php on pod startup for us. So, all we need to do is add a new Configmap to our `web` deployment.
+Fortunately, our `ten7/flight-deck-drupal:latest` container expects a YAML file as configuration. This is used by the container to create the `settings.php` with updated settings on pod startup. So, all we need to do is add a new Configmap to provide the YAML file to our `web` deployment.
 
 1. Using a text editor, open the `configmaps.yml` file.
 2. Add the following to the end of the file, noting the `---` separator:
 ```yaml
----
+  ---
   apiVersion: v1
   kind: ConfigMap
   metadata:
@@ -343,7 +345,7 @@ Fortunately, our `ten7/flight-deck-drupal:latest` container also accepts a Confi
   kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
 ```
 4. Using a text editor, open the `web.yml` file.
-5. Update the `Deployment` definition. Add the following under the `volumes` section:
+5. Update the `Deployment` definition to add the following under the `volumes` section:
 ```yaml
   - name: "vol-drupal-config"
     configMap:
