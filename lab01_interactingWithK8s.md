@@ -17,7 +17,7 @@ On MacOS:
 
 1. Open a web browser to the following address:
 ```
-  https://hub.docker.com/editions/community/docker-ce-desktop-mac
+https://hub.docker.com/editions/community/docker-ce-desktop-mac
 ```
 2. Click **Get Docker**.
 3. Install the application as you would any MacOS app.
@@ -26,7 +26,7 @@ On Windows:
 
 1. Open a web browser to the following address:
 ```
-  https://hub.docker.com/editions/community/docker-ce-desktop-windows
+https://hub.docker.com/editions/community/docker-ce-desktop-windows
 ```
 2. Click **Get Docker**.
 3. Run the installer, follow on-screen instructions.
@@ -48,7 +48,7 @@ Many hosting providers will allow you to create k8s clusters using an API. This 
 
 1. Using a web browser, navigate to DigitalOcean's web portal:
 ```
-  https://cloud.digitalocean.com
+https://cloud.digitalocean.com
 ```
 2. Using the green **Create** button at the top of the page, select **Create** &gt; **Cluster**.
 3. Select a **Kubernetes Version** if so directed. By default, the newest version is selected.
@@ -89,23 +89,24 @@ Now that we have the kubeconfig file, we can finally use `kubectl`. Even though 
 
 1. Using the command line, enter the following:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes
+kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes
 ```
 Where:
     * **/path/to/kubeconfig.yml** is the full path to the kubeconfig file you downloaded earlier.
 2. Note the command output, it should list all the worker machines ("node") provisioned when you created the cluster:
 ```
-  NAME            STATUS   ROLES    AGE     VERSION
-  web-pool-b64y   Ready    <none>   2d13h   v1.13.10
-  web-pool-b6hs   Ready    <none>   2d13h   v1.13.10
-  web-pool-b6hu   Ready    <none>   2d14h   v1.13.10
+NAME            STATUS   ROLES    AGE     VERSION
+web-pool-b64y   Ready    <none>   2d13h   v1.13.10
+web-pool-b6hs   Ready    <none>   2d13h   v1.13.10
+web-pool-b6hu   Ready    <none>   2d14h   v1.13.10
 ```
 3. You may also list only the node names by using `--output=name`:
 ```shell
-  $ kubectl --kubeconfig="path/to/kubeconfig.yml" --output=name get nodes
-  node/web-pool-b64y
-  node/web-pool-b6hs
-  node/web-pool-b6hu
+$ kubectl --kubeconfig="path/to/kubeconfig.yml" --output=name get nodes
+
+node/web-pool-b64y
+node/web-pool-b6hs
+node/web-pool-b6hu
 ```
 
 ## Describe a node
@@ -114,12 +115,12 @@ In addition to `get`, you can also get the details of a particular node using th
 
 1. Using the command line, list the nodes in your cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes
+kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes
 ```
 2. From the list, choose a particular node name.
 3. Enter the following command:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" describe node the-node-name
+kubectl --kubeconfig="/path/to/kubeconfig.yml" describe node the-node-name
 ```
 Where:
   * **the-node-name** is the name of the node.
@@ -133,7 +134,7 @@ In Kubernetes, individual nodes may be assigned one or more key-value pairs to a
 1. Using the command line, list the nodes in your cluster. Select a particular node to apply a label.
 2. Enter the following command:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" label nodes the-node-name my-key=my-value
+kubectl --kubeconfig="/path/to/kubeconfig.yml" label nodes the-node-name my-key=my-value
 ```
 Where:
   * **the-node-name** is the name of the node.
@@ -142,7 +143,7 @@ Where:
 3. Describe the node, and confirm the label is now applied.
 4. Next, we'll list only the nodes in our cluster with our custom label. Enter the following, using the label key and value you just applied:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes -l my-key=my-value
+kubectl --kubeconfig="/path/to/kubeconfig.yml" get nodes -l my-key=my-value
 ```
 5. Note that the output now shows only one node.
 6. Apply the label to a second node and repeat the get nodes command with your custom label. Note the output.

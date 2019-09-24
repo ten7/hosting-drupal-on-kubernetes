@@ -17,30 +17,30 @@ Secrets aren't considered a part of a Deployment or a Statefulset. They are thei
 1. Using a text editor, create a new file `secrets.yml`.
 2. Edit the file to define a new Secret:
 ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: drupal-db
-  type: Opaque
-  stringData:
-    drupal-db-password.txt: "abetterpasswordthanthis"
+apiVersion: v1
+kind: Secret
+metadata:
+  name: drupal-db
+type: Opaque
+stringData:
+  drupal-db-password.txt: "abetterpasswordthanthis"
 ```
 3. Use `kubectl` to apply the file to the cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/secrets.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/secrets.yml
 ```
 4. Although our `secrets.yml` file is pretty simple, it's still subject to the same validation as are Deployments, Services, and Statefulsets. If there are errors, go back and correct them, then, reapply the file.
 5. List all the secrets on the cluster:
 ```shell
-  $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get secrets
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get secrets
 
-  NAME                  TYPE                                  DATA   AGE
-  default-token-8kf7b   kubernetes.io/service-account-token   3      3d19h
-  drupal-db             Opaque                                1      7s
+NAME                  TYPE                                  DATA   AGE
+default-token-8kf7b   kubernetes.io/service-account-token   3      3d19h
+drupal-db             Opaque                                1      7s
 ```
 6. Now, edit the secret:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" edit secret drupal-db
+kubectl --kubeconfig="/path/to/kubeconfig.yml" edit secret drupal-db
 ```
 6. Notice that the password we entered earlier is no longer in plaintext. It's been base64 encoded. Also, the `stringData` key was replaced with a `data` key.
 
@@ -51,71 +51,71 @@ With our Secret created, let's put it to use on our web deployment.
 1. Using a text editor, open the `web.yml` file you created earlier in the class.
 2. Update the `Deployment` definition to add the `volumes` section. It should be at the indent level as `containers`:
 ```yaml
-  volumes:
-    - name: "vol-drupal-db"
-      secret:
-        secretName: "drupal-db"
+volumes:
+  - name: "vol-drupal-db"
+    secret:
+      secretName: "drupal-db"
 ```
 3. Update the `Deployment` definition to add the `volumeMounts` section. It should be at the same indent level as `ports`:
 ```yaml
-  volumeMounts:
-    -  name: "vol-drupal-db"
-       mountPath: "/config/drupal-db"
+volumeMounts:
+  - name: "vol-drupal-db"
+    mountPath: "/config/drupal-db"
 ```
 4. When finished, your `web.yml` file should look like this:
 ```yaml
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    labels:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
       app: web
-    name: web
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
+  template:
+    metadata:
+      labels:
         app: web
-    template:
-      metadata:
-        labels:
-          app: web
-      spec:
-        containers:
-          - image: ten7/flight-deck-drupal:latest
-            name: web
-            ports:
-              - containerPort: 80
-            volumeMounts:
-              -  name: "vol-drupal-db"
-                 mountPath: "/config/drupal-db"
-        volumes:
-          - name: "vol-drupal-db"
-            secret:
-              secretName: "drupal-db"
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: web
-  spec:
-    ports:
-      - name: http
-        port: 80
-        protocol: TCP
-    selector:
-      app: web
-    type: LoadBalancer
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            -  name: "vol-drupal-db"
+               mountPath: "/config/drupal-db"
+      volumes:
+        - name: "vol-drupal-db"
+          secret:
+            secretName: "drupal-db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web
+  type: LoadBalancer
 ```
 5. Save the file, then apply the updated deployment to the cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
 6. List the pods in the cluster. Notice that the pod(s) for your `web` deployment were recently recreated:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
-  NAME                  READY   STATUS    RESTARTS   AGE
-  mysql-0               1/1     Running   0          2d10h
-  web-5ddcb78d8-p5lqb   1/1     Running   0          19m
+kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+NAME                  READY   STATUS    RESTARTS   AGE
+mysql-0               1/1     Running   0          2d10h
+web-5ddcb78d8-p5lqb   1/1     Running   0          19m
 ```
 
 ## Examine files
@@ -125,18 +125,18 @@ At first, recreatng the pods seems like an excessive response to a configuration
 1. Examine the `web.yml` file. Notice that under `volumeMounts`, we mounted the secret under `/config/drupal-db`.
 2. Return to the List the pods in your cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
 ```
 3. Locate the pod starting with **web-**, and note the full pod name.
 4. Enter into the web pod using `kubectl`:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" exec -it web-abcdef-12345 /bin/bash
+kubectl --kubeconfig="/path/to/kubeconfig.yml" exec -it web-abcdef-12345 /bin/bash
 ```
 Where:
   * **web-abcdef-12345** is the full web pod name.
 5. Change to the directory specified by the `volumeMounts` line in `web.yml`:
 ```shell
-  $ cd /config/drupal-db/
+$ cd /config/drupal-db/
 ```
 6. List the contents of the directory. You should see one file:
 ```shell
@@ -157,32 +157,32 @@ Our database container, `ten7/flight-deck-db:develop`, is built to [expect a YAM
 1. Using a text editor, create a new file `configmaps.yml`.
 2. Edit the file to be the following:
 ```yaml
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: mysql
-  data:
-    flight-deck-db.yml: |
-      mysql_databases:
-      - name: "drupal"
-      mysql_users:
-      - name: "drupal"
-        host: "%"
-        passwordFile: "/config/drupal-db/drupal-db-password.txt"
-        priv: "drupal.*:ALL"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+data:
+  flight-deck-db.yml: |
+    mysql_databases:
+    - name: "drupal"
+    mysql_users:
+    - name: "drupal"
+      host: "%"
+      passwordFile: "/config/drupal-db/drupal-db-password.txt"
+      priv: "drupal.*:ALL"
 ```
 3. Notice that like Secrets, a Configmap can host multiple files, each is an item under the `data` list.
 4. Apply the `configmaps.yml` file to the cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
 ```
 5. Repeat the editing process if the validation fails.
 6. List all the Configmaps on the cluster:
 ```shell
-  $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get configmaps         
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get configmaps         
 
-  NAME    DATA   AGE
-  mysql   1      10s
+NAME    DATA   AGE
+mysql   1      10s
 ```
 7. Edit the Configmap:
 ```shell
@@ -197,14 +197,14 @@ Mounting a Configmap inside a Statefulset is the largely the same process as add
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
 2. Update the `Statefulset` definition to add the following under the `volumes` section:
 ```yaml
-  - name: "vol-flightdeck-db"
-    configMap:
-      name: "mysql"
+- name: "vol-flightdeck-db"
+  configMap:
+    name: "mysql"
 ```
 3. Update the `Statefulset` definition to add the following under the `volumeMounts` section:
 ```yaml
-  - mountPath: "/config/mysql"
-    name: "vol-flightdeck-db"
+- mountPath: "/config/mysql"
+  name: "vol-flightdeck-db"
 ```
 4. Save the file, but do **not** apply it yet! We have more we need to do first...
 
@@ -216,108 +216,108 @@ Notice that when we created the Configmap, we didn't actually put the password f
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
 2. Update the `Statefulset` definition. Add the following under the `volumes` section:
 ```yaml
-  - name: "vol-drupal-db"
-    secret:
-      secretName: "drupal-db"
+- name: "vol-drupal-db"
+  secret:
+    secretName: "drupal-db"
 ```
 3. Update the `Statefulset` definition to add the following under the `volumeMounts` section:
 ```yaml
-  - mountPath: "/config/drupal-db"
-    name: "vol-drupal-db"
+- mountPath: "/config/drupal-db"
+  name: "vol-drupal-db"
 ```
 4. When finished, the file should look like this:
 ```yaml
-  apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    name: mysql
-  spec:
-    selector:
-      matchLabels:
-        app: mysql
-    serviceName: mysql
-    replicas: 1
-    template:
-      metadata:
-        labels:
-          app: mysql
-      spec:
-        initContainers:
-          - name: "fix-pvc-permissions"
-            image: "alpine:3.9"
-            command:
-              - "sh"
-              - "-c"
-              - "chown -R 1000:1000 /var/lib/mysql"
-            volumeMounts:
-              - mountPath: /var/lib/mysql
-                name: vol-mysql
-        containers:
-          - name: "db"
-            image: "ten7/flight-deck-db:develop"
-            ports:
-              - containerPort: 3306
-                name: mysql
-                protocol: TCP
-            volumeMounts:
-              - mountPath: "/var/lib/mysql"
-                name: "vol-mysql"
-              - mountPath: "/config/mysql"
-                name: "vol-flightdeck-db"
-              - mountPath: "/config/drupal-db"
-                name: "vol-drupal-db"
-        volumes:
-          - name: "vol-mysql"
-            persistentVolumeClaim:
-              claimName: mysql
-          - name: "vol-flightdeck-db"
-            configMap:
-              name: "mysql"
-          - name: "vol-drupal-db"
-            secret:
-              secretName: "drupal-db"
-    volumeClaimTemplates:
-      - metadata:
-          name: vol-mysql
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 10Gi
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: mysql
-  spec:
-    clusterIP: None
-    ports:
-      - name: mysql
-        port: 3306
-        protocol: TCP
-    selector:
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
       app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+        - name: "fix-pvc-permissions"
+          image: "alpine:3.9"
+          command:
+            - "sh"
+            - "-c"
+            - "chown -R 1000:1000 /var/lib/mysql"
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              name: "vol-mysql"
+            - mountPath: "/config/mysql"
+              name: "vol-flightdeck-db"
+            - mountPath: "/config/drupal-db"
+              name: "vol-drupal-db"
+      volumes:
+        - name: "vol-mysql"
+          persistentVolumeClaim:
+            claimName: mysql
+        - name: "vol-flightdeck-db"
+          configMap:
+            name: "mysql"
+        - name: "vol-drupal-db"
+          secret:
+            secretName: "drupal-db"
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  clusterIP: None
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+  selector:
+    app: mysql
 ```
 5. Apply the changes to the cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
 ```
 6. List the pods in the cluster, notice that the mysql pod is being terminated and recreated:
 ```shell
-  $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
 
-  NAME                  READY   STATUS        RESTARTS   AGE
-  mysql-0               0/1     Terminating   0          2d13h
-  web-5ddcb78d8-p5lqb   1/1     Running       0          141m
+NAME                  READY   STATUS        RESTARTS   AGE
+mysql-0               0/1     Terminating   0          2d13h
+web-5ddcb78d8-p5lqb   1/1     Running       0          141m
 ```
 7. After a minute or two, repeat the `get pods`. You'll notice that the container is now running again:
 ```shell
-  $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
 
-  NAME                  READY   STATUS    RESTARTS   AGE
-  mysql-0               1/1     Running   0          56s
-  web-5ddcb78d8-p5lqb   1/1     Running   0          142m
+NAME                  READY   STATUS    RESTARTS   AGE
+mysql-0               1/1     Running   0          56s
+web-5ddcb78d8-p5lqb   1/1     Running   0          142m
 ```
 
 ## Configuring the web container
@@ -329,93 +329,93 @@ Fortunately, our `ten7/flight-deck-drupal:latest` container expects a YAML file 
 1. Using a text editor, open the `configmaps.yml` file.
 2. Add the following to the end of the file, noting the `---` separator:
 ```yaml
-  ---
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: drupal
-  data:
-    flight-deck-web.yml: |
-      MYSQL_NAME: "drupal"
-      MYSQL_USER: "drupal"
-      MYSQL_PASS_FILE: "/config/drupal-db/drupal-db-password.txt"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: drupal
+data:
+  flight-deck-web.yml: |
+    MYSQL_NAME: "drupal"
+    MYSQL_USER: "drupal"
+    MYSQL_PASS_FILE: "/config/drupal-db/drupal-db-password.txt"
 ```
 3. Save an apply the file to the cluster:
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
 ```
 4. Using a text editor, open the `web.yml` file.
 5. Update the `Deployment` definition to add the following under the `volumes` section:
 ```yaml
-  - name: "vol-drupal-config"
-    configMap:
-      name: "drupal"
+- name: "vol-drupal-config"
+  configMap:
+    name: "drupal"
 ```
 3. Add the following under the `volumeMounts` section:
 ```yaml
-  - name: "vol-drupal-config"
-    mountPath: "/config/web"
+- name: "vol-drupal-config"
+  mountPath: "/config/web"
 ```
 4. When finished, the file should look like this:
 ```yaml
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    labels:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
       app: web
-    name: web
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
+  template:
+    metadata:
+      labels:
         app: web
-    template:
-      metadata:
-        labels:
-          app: web
-      spec:
-        containers:
-          - image: ten7/flight-deck-drupal:latest
-            name: web
-            ports:
-              - containerPort: 80
-            volumeMounts:
-              - name: "vol-drupal-db"
-                mountPath: "/config/drupal-db"
-              - name: "vol-drupal-config"
-                mountPath: "/config/web"
-        volumes:
-          - name: "vol-drupal-db"
-            secret:
-              secretName: "drupal-db"
-          - name: "vol-drupal-config"
-            configMap:
-              name: "drupal"
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: web
-  spec:
-    ports:
-      - name: http
-        port: 80
-        protocol: TCP
-    selector:
-      app: web
-    type: LoadBalancer
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: "vol-drupal-db"
+              mountPath: "/config/drupal-db"
+            - name: "vol-drupal-config"
+              mountPath: "/config/web"
+      volumes:
+        - name: "vol-drupal-db"
+          secret:
+            secretName: "drupal-db"
+        - name: "vol-drupal-config"
+          configMap:
+            name: "drupal"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web
+  type: LoadBalancer
 ```
 5. Apply the `web.yml` file to the cluster.
 ```shell
-  kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
+kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
 6. List the pods in the cluster. As expected, the `web-` pod was recently recreated:
 ```shell
-  $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods        
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods        
 
-  NAME                  READY   STATUS    RESTARTS   AGE
-  mysql-0               1/1     Running   0          25m
-  web-57dd9c55b-tgw6l   1/1     Running   0          28s
+NAME                  READY   STATUS    RESTARTS   AGE
+mysql-0               1/1     Running   0          25m
+web-57dd9c55b-tgw6l   1/1     Running   0          28s
 ```
 
 ## Validate changes
