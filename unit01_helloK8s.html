@@ -1,52 +1,345 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
-		<title>reveal.js</title>
+    <title>reveal.js</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/TEN7.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/reveal.css" rel="stylesheet">
+    <link href="css/theme/TEN7.css" rel="stylesheet">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link href="lib/css/monokai.css" rel="stylesheet">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>
-          <section>
-            <h1><small>Unit #1</small><br />Hello, k8s!</h1>
-            <small><br/>use &larr;&uarr;&darr;&rarr; or &lt;space&gt;</small>
-        </section>
-			</div>
-		</div>
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+		<section>
+			<h1><small>Unit #1</small><br/>Hello, k8s!</h1>
+			<small><br/>use &larr;&uarr;&darr;&rarr; or &lt;space&gt;</small>
+		</section>
+		<section>
+			<section>
+				<h1>Skyscrapers vs. Skylines</h1>
+			</section>
+			<!--
+			Product owner: Help! Our site is running too slow!
+			Ops: Okay! I'll add more memory and CPU to the server.
 
-		<script src="js/reveal.js"></script>
+			Later...
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true }
-				]
-			});
-		</script>
-	</body>
+			Owner: Help! The site is slow! Can you make the server bigger again?
+			Ops: Ummmmm...
+
+			-->
+			<section>
+				<h2>Scaling up</h2>
+				<p class="fragment">Adds resources (CPU, memory) to the server</p>
+				<p class="fragment">Oldest capacity management method</p>
+			</section>
+			<section>
+				<h2>Limitations</h2>
+				<p class="fragment">Hardware can only get so big</p>
+				<p class="fragment">Time, money, or technical reasons</p>
+			</section>
+			<!--
+			Owner: Help!
+			Ops: It'll be okay! We'll add more servers!
+
+			Later...
+
+			Owner: What's "gateway timeout" mean?
+			Ops: Ughghghghghgh...
+			-->
+			<section>
+				<h2>Scaling out</h2>
+				<p class="fragment">Adds more servers to application</p>
+				<p class="fragment">Multiple for the same part of the app</p>
+			</section>
+			<section>
+				<h2>Limitations</h2>
+				<p class="fragment">Requires app re-architecting</p>
+				<p class="fragment">Can be difficult for humans to manage, troubleshoot</p>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h1>Containers and clustering</h1>
+			</section>
+			<!--
+			Meanwhile...
+
+			Developer: Ugh! This works on my system!
+			Ops: Oh, you have a newer version of X.
+			Dev: Can we update that in prod?
+			Ops: [crestfallen]
+			-->
+			<section>
+				<h2>Dependencies</h2>
+				<p class="fragment">Libraries, versions, key configuration</p>
+				<p class="fragment">Co-hosted apps may have <strong>conflicting</strong> requirements!</p>
+			</section>
+			<section>
+				<h2>Containers</h2>
+				<p class="fragment">Packages OS image with application</p>
+				<p class="fragment">Dependencies managed as single unit</p>
+			</section>
+			<section>
+				<h2>Docker</h2>
+				<p class="fragment">Popular container toolkit</p>
+				<p class="fragment">Simplifies underlying container details</p>
+				<p class="fragment">Strong developer support</p>
+			</section>
+			<!--
+			Ops: So why not just run Docker in production, then?
+			-->
+			<section>
+				<h2>Clustering containers</h2>
+				<p class="fragment">Requires deep knowledge</p>
+				<p class="fragment">Difficult to manage manually</p>
+			</section>
+			<section>
+				<h2>What to manage?</h2>
+				<ul>
+					<li class="fragment">Provisioning</li>
+					<li class="fragment">Resource limits & access policies</li>
+					<li class="fragment">Network, firewall, load balancing</li>
+					<li class="fragment">Health monitoring</li>
+					<li class="fragment">Lots more..</li>
+				</ul>
+			</section>
+			<!--
+			Ops: Ugh. If there were only a unified way of doing all of that...
+			-->
+		</section>
+		<section>
+			<section>
+				<h1>Kubernetes to the rescue!</h1>
+			</section>
+			<section>
+				<h2>Container orchestrator</h2>
+				<p class="fragment">Coordinates hosts (<em>nodes</em>) to act as one</p>
+				<p class="fragment">Deploy instances, distribute load, deliver resources</p>
+			</section>
+			<section>
+				<h2>Open source</h2>
+				<p class="fragment">Created by Google, maintained by <a href="https://www.cncf.io/">CNCF</a></p>
+				<p class="fragment"><a href="https://github.com/kubernetes/kubernetes">Available on Github</a></p>
+			</section>
+			<section>
+				<h2>Expressive power</h2>
+				<p class="fragment"><em>Pods</em> only one manageable object</p>
+				<p class="fragment">Taylor k8s to your app, not the other way around</p>
+			</section>
+			<section>
+				<h2>Interacting</h2>
+				<p class="fragment">Objects defined as declarative YAML</p>
+				<p class="fragment">Can be live-edited, patched, diffed</p>
+			</section>
+			<section>
+				<h2>Terminal friendly</h2>
+				<p class="fragment"><code>kubectl</code> command</p>
+				<p class="fragment">Single point of access to cluster</p>
+				<p class="fragment">Plays well with scripts, automation</p>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h1>Hosting Kubernetes</h1>
+			</section>
+			<section>
+				<h2>Self-hosting</h2>
+				<p class="fragment">More work, but you control everything</p>
+				<p class="fragment">Requires dedicated staff to maintain</p>
+				<p class="fragment">Dedicated <em>manager node</em> required</p>
+			</section>
+			<section>
+				<h2>Installation</h2>
+				<ol>
+					<li class="fragment">Install Docker, kubelet</li>
+					<li class="fragment">Install <code>kubeadm</code>, <code>kubectl</code> on manager</li>
+					<li class="fragment">Install Container Networking, such as <a href="https://www.projectcalico.org/">Calico</a></li>
+					<li class="fragment">Use <code>kubeadm</code> to stand up cluster</li>
+				</ol>
+				<p class="fragment"><a href="https://linode.com/docs/applications/containers/how-to-deploy-nginx-on-a-kubernetes-cluster/">Tutorial on Linode docs</a></p>
+			</section>
+			<section>
+				<h2>Storage</h2>
+				<p class="fragment">Requires additional infrastructure for k8s</p>
+				<p class="fragment">NFS works, <span class="fragment"><a href="https://ceph.com/">Ceph</a>, <a href="https://rook.io/">Rook</a>, <a href="https://github.com/heketi/heketi">Heketi</a> are k8s native</span></p>
+			</section>
+			<section>
+				<h2>Managed hosting</h2>
+				<p class="fragment">Like a VPS, but for k8s workloads</p>
+				<p class="fragment">Pay only for workers, storage baked-in</p>
+			</section>
+			<section>
+				<h2>Providers</h2>
+				<p class="fragment">Amazon, Azure, DigitalOcean, Google GKE, others</p>
+				<p class="fragment"><a href="https://kubernetes.io/docs/setup/pick-right-solution/">kubernetes.io/docs/setup/pick-right-solution</a></p>
+			</section>
+			<section>
+				<h2>Digitalocean</h2>
+				<p class="fragment">World-wide k8s provider</p>
+				<p class="fragment">REST-based API</p>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h1>Creating a cluster</h1>
+			</section>
+			<section>
+				<h2>Planning</h2>
+				<p class="fragment">Always estimate capacity first!</p>
+				<p class="fragment">New servers easier to add in k8s</p>
+			</section>
+			<section>
+				<h2>Server count</h2>
+				<p class="fragment">2 worker nodes minimum</p>
+				<p class="fragment">3 or more is best</p>
+			</section>
+			<section>
+				<h2>CPU, memory</h2>
+				<p class="fragment">Balance hosting costs with needed resources</p>
+				<p class="fragment">Start with today's resources * 1.25</p>
+			</section>
+			<section>
+				<h2>Flexibility</h2>
+				<p class="fragment">Scaling out easier on managed k8s</p>
+				<p class="fragment">Plan, but not too hard!</p>
+			</section>
+			<section>
+				<h2>Allocation</h2>
+				<p class="fragment">Done at hosting provider level</p>
+				<p class="fragment">Via web portal, API, or dedicated CLI app</p>
+				<p class="fragment"><strong>Not</strong> <code>kubectl</code>!</p>
+			</section>
+			<section>
+				<h2>Using the API</h2>
+				<p class="fragment">POST a <a href="https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster">JSON request</a> using <code>curl</code></p>
+				<p class="fragment"><a href="https://galaxy.ansible.com/ten7/digitalocean"><code>ten7.digitalocean</code></a> role on Ansible Galaxy</p>
+			</section>
+			<section>
+				<h2>Using the web portal</h2>
+				<p class="fragment"><a href="https://cloud.digitalocean.com/">cloud.digitalocean.com</a></p>
+				<p class="fragment"><strong>Create</strong> &gt; <strong>Clusters</strong></p>
+			</section>
+			<section data-background="images/unit01/createCluster01.png" data-background-size="contain">
+				&nbsp;
+			</section>
+			<section data-background="images/unit01/createCluster02.png" data-background-size="contain">
+				&nbsp;
+			</section>
+			<section data-background="images/unit01/createCluster03.png" data-background-size="contain">
+				&nbsp;
+			</section>
+			<section data-background="images/unit01/createCluster04.png" data-background-size="contain">
+				&nbsp;
+			</section>
+		</section>
+		<section>
+			<section>
+				<h1>Using kubectl</h1>
+			</section>
+			<section>
+				<h2>Installation</h2>
+				<p class="fragment">Multiple options, different pros, cons</p>
+			</section>
+			<section>
+				<h2>From dist</h2>
+				<p class="fragment">Installs only needed binaries</p>
+				<p class="fragment"><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubernetes.io/docs/tasks/tools/install-kubectl</a></p>
+			</section>
+			<section>
+				<h2>Package Manager</h2>
+				<p class="fragment"><a href="https://brew.sh/">homebrew</a> on macOS</p>
+				<p class="fragment"><a href="https://chocolatey.org/">Chocolatey</a>, <a href="https://scoop.sh/">Scoop</a>, or <a href="https://www.powershellgallery.com/">Powershell Gallery</a></p>
+				<p class="fragment">Linux: use your distro's default</p>
+			</section>
+			<section>
+				<h2>Docker for Mac, Win</h2>
+				<p class="fragment"><code>kubectl</code> included out of the box</p>
+				<p class="fragment">Docker needed to develop containers</p>
+			</section>
+			<section>
+				<h2>Authorizing</h2>
+				<p class="fragment">Depends on hosting provider</p>
+				<p class="fragment">CLI command, auth token, <em>kubeconfig</em> file</p>
+			</section>
+			<section>
+				<h2>Getting kubeconfig</h2>
+				<ol>
+					<li class="fragment">cloud.digitalocean.com</li>
+					<li class="fragment"><strong>Manage</strong> &gt; <strong>Kubernetes</strong></li>
+					<li class="fragment">Click <strong>Download config file</strong></li>
+				</ol>
+			</section>
+			<section data-background="images/unit01/getKubeconfig.png" data-background-size="contain">
+				&nbsp;
+			</section>
+			<section>
+				<h2>Getting via API</h2>
+				<p class="fragment">Better for scripts, automation</p>
+				<p class="fragment"><a href="https://galaxy.ansible.com/ten7/digitalocean_kubeconfig"><code>ten7.digitalocean_kubeconfig</code></a> role</p>
+			</section>
+			<section>
+				<h2>Using kubeconfig</h2>
+				<p class="fragment"><code>kubectl</code> <em>verb</em> <em>object</em></p>
+			</section>
+			<section>
+				<h2>Listing worker nodes</h2>
+				<pre class="fragment"><code>$ kubectl get nodes
+
+NAME            STATUS   ROLES    AGE     VERSION
+web-pool-b64y   Ready    <none>   2d13h   v1.13.10
+web-pool-b6hs   Ready    <none>   2d13h   v1.13.10
+web-pool-b6hu   Ready    <none>   2d14h   v1.13.10</code></pre>
+			</section>
+			<section>
+				<h2>Getting details</h2>
+				<p class="fragment"><code>kubectl describe node</code> <em>nodeName</em></p>
+				<p class="fragment">Lists status, CPU, memory allocation, and more</p>
+			</section>
+		</section>
+		<section>
+			<section>
+				<h2>Lab #1</h2>
+				<ol>
+					<li>Install <code>kubectl</code></li>
+					<li>Create cluster</li>
+					<li>Download kubeconfig file</li>
+					<li>Interact with cluster</li>
+				</ol>
+			</section>
+		</section>
+    </div>
+</div>
+
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'plugin/highlight/highlight.js', async: true}
+        ]
+    });
+</script>
+</body>
 </html>
