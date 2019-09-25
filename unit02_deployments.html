@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>reveal.js</title>
+    <title>Unit 2 - Deployments</title>
 
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/reveal.css">
@@ -26,12 +26,390 @@
 <div class="reveal">
     <div class="slides">
         <section>
-            <section>
+            <section data-background="images/background.svg" data-background-size="contain">
                 <h1><small>Unit #2</small><br/>Deployments</h1>
                 <small><br/>use &larr;&uarr;&darr;&rarr; or &lt;space&gt;</small>
             </section>
         </section>
         <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Apps in k8s</h1>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods04.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods06.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods07.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>"App" = container image</h2>
+                <p class="fragment">Combines operating system, application</p>
+                <p class="fragment">Docker images <em>de facto</em> standard</p>
+            </section>
+            <section>
+                <h2>Where to get images?</h2>
+                <p class="fragment">Use, modify public images</p>
+                <p class="fragment">Build your own!</p>
+            </section>
+            <section>
+                <h2>Container registry</h2>
+                <p class="fragment">Hosts container images</p>
+                <p class="fragment">Can be shared, or private self-hosted</p>
+            </section>
+            <section>
+                <h2>Docker hub</h2>
+                <p class="fragment">Largest, shared container registry</p>
+                <p class="fragment">hub.docker.org</p>
+            </section>
+            <section>
+                <h2>Downloader, beware!</h2>
+                <p class="fragment">Always security review public images!</p>
+                <p class="fragment">Be aware of supply-chain attacks</p>
+            </section>
+            <section>
+                <h2>Flight deck</h2>
+                <p class="fragment">TEN7 own, Drupal and k8s friendly containers</p>
+                <p class="fragment"><a href="https://github.com/ten7/flight-deck">github.com/ten7/flight-deck</a></p>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Deploying applications</h1>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods07.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/clusterAndPods08.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Pods</h2>
+                <p class="fragment">Running instance of an application</p>
+            </section>
+            <section>
+                <h2>Containers vs. Pods</h2>
+                <p class="fragment">Pod can be one or more containers</p>
+                <p class="fragment">Each container shares the same localhost</p>
+                <p class="fragment">IP address, DNS name, Volumes, etc.</p>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods04.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/pods06.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Co-hosting containers</h2>
+                <p class="fragment">Ensure tight coupling where needed</p>
+                <p class="fragment">Apache+Varnish, NGINX+PHP-FPM</p>
+            </section>
+            <section>
+                <h2>You can't "just run it"</h2>
+                <p class="fragment">Pods rarely created directly</p>
+                <p class="fragment">Created indirectly through a managing object</p>
+            </section>
+            <section>
+                <h2>Deployments</h2>
+                <p class="fragment">Describes ideal state of a pod</p>
+                <p class="fragment">Can run multiple <em>replicas</em> of the pod</p>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Defining Deployments</h1>
+            </section>
+            <section>
+                <h2>Two methods</h2>
+                <p class="fragment"><code>kubectl create</code> <em>objectType</em></p>
+                <p class="fragment"><code>kubectl apply -f /path/to/file.yml</code></p>
+            </section>
+            <section>
+                <h2>Files are better</h2>
+                <p class="fragment">Same format as when edited</p>
+                <p class="fragment">Easily added to version control (git)</p>
+            </section>
+            <section>
+                <h2>YAML</h2>
+                <p class="fragment">Indent-based markup format</p>
+                <p class="fragment">All k8s objects can be created in YAML</p>
+            </section>
+            <section>
+                <img src="images/unit02/yamlStructure.png"/>
+            </section>
+            <section>
+                <h2>Header</h2>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment</code></pre>
+            </section>
+            <section>
+                <h2>Metadata</h2>
+                <p class="fragment">Name</p>
+                <p class="fragment">Labels</p>
+                <p class="fragment">Annotations</p>
+            </section>
+            <section>
+                <pre><code>metadata:
+  labels:
+    app: web
+  name: web</code></pre>
+            </section>
+            <section>
+                <h2>Specification</h2>
+                <p class="fragment">Main body of the document</p>
+                <p class="fragment">Defines the object, or template of objects to create</p>
+            </section>
+            <section>
+                <h2>Deployment spec</h2>
+                <ul>
+                    <li class="fragment">Number of replicas</li>
+                    <li class="fragment">Selector (we'll use this later)</li>
+                    <li class="fragment">Template of pod to create</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Pod template</h2>
+                <p class="fragment">Like a YAML document itself</p>
+                <p class="fragment">Has it's own metadata, spec</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Working with deployments</h1>
+            </section>
+            <section>
+                <h2>Applying</h2>
+                <p class="fragment">Deploys definitions to cluster</p>
+                <pre class="fragment"><code>$ kubectl --kubeconfig=/path/to/kubeconfig.yml apply -f /path/to/file.yml</code></pre>
+            </section>
+            <section>
+                <h2>Validation</h2>
+                <p class="fragment">Done by <code>kubectl</code> before creation</p>
+                <p class="fragment">Transaction-like, doesn't create partial objects</p>
+            </section>
+            <section>
+                <h2>Updating from file</h2>
+                <p class="fragment"><code>kubectl apply -f /path/to/file.yml</code></p>
+                <p class="fragment">Existing object will be patched</p>
+            </section>
+            <section>
+                <h2>Listing deployments</h2>
+                <pre class="fragment"><code>$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get deployments
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+web    1/1     1            1           8m52s</code></pre>
+            </section>
+            <section>
+                <h2>Getting details</h2>
+                <p class="fragment"><code>kubectl describe deployment</code> <em>name</em></p>
+                <p class="fragment">Includes operational information</p>
+            </section>
+            <section>
+                <h2>"Hot" editing</h2>
+                <p class="fragment">Edits definition in-place on cluster</p>
+                <p class="fragment">Useful for critical fixes, troubleshooting</p>
+            </section>
+            <section>
+                <pre><code>kubectl --kubeconfig="/path/to/kubeconfig.yml" edit deployment web</code></pre>
+            </section>
+            <section>
+                <h2>Listing pods</h2>
+                <p class="fragment"><code>kubectl get pods</code></p>
+            </section>
+            <section>
+                <pre><code>$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
+
+NAME                   READY   STATUS    RESTARTS   AGE
+web-56c74df886-46wcf   1/1     Running   0          37m
+web-56c74df886-gpf9c   1/1     Running   0          3m13s
+web-56c74df886-kz95s   1/1     Running   0          3m13s</code></pre>
+            </section>
+            <section>
+                <h2>Pod names</h2>
+                <p class="fragment"><em>deploymentName</em>-<em>uniqueID</em></p>
+                <p class="fragment">Names are <strong>non-deterministic!</strong></p>
+            </section>
+            <section>
+                <h2>Getting a shell</h2>
+                <p class="fragment"><code>kubectl exec -it</code> <em>command</em></p>
+                <p class="fragment">Runs <em>command</em> in pod, like <code>/bin/bash</code></p>
+            </section>
+            <section>
+                <pre><code>kubectl --kubeconfig="/path/to/kubeconfig.yml" exec -it web-56c74df886-gpf9c /bin/bash</code></pre>
+                <small class="fragment">(Scroll right.)</small>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Exposing deployments</h1>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services04.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services06.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services07.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit02/services08.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Services</h2>
+                <p class="fragment">Consistent application endpoint</p>
+                <p class="fragment">Creates internal DNS name</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web</code></pre>
+            </section>
+            <section>
+                <h2>Selector</h2>
+                <p class="fragment">Key-value pair defined on Service</p>
+                <p class="fragment">Used by <code>spec.selector</code> in Deployment</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web</code></pre>
+            </section>
+            <section>
+                <h2>YAML multidoc</h2>
+                <p class="fragment">Allows multiple roots in same file</p>
+                <p class="fragment">Separated by <code>---</code></p>
+                <p class="fragment">Optional, useful for highly-related definitions</p>
+            </section>
+            <section>
+                <h2>Managing Services</h2>
+                <p class="fragment"><code>kubectl get services</code></p>
+                <p class="fragment"><code>kubectl describe service</code> <em>name</em></p>
+                <p class="fragment"><code>kubectl edit services</code> <em>name</em></p>
+            </section>
+            <section>
+                <h2>Service types</h2>
+                <p class="fragment"><code>ClusterIP</code>: default, internal only</p>
+                <p class="fragment"><code>NodePort</code>: Exposes port on each node</p>
+                <p class="fragment"><code>LoadBalancer</code>: External access</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web
+  type: LoadBalancer</code></pre>
+            </section>
+        </section>
+        <section data-background="images/background.svg" data-background-size="contain">
             <section>
                 <h2>Lab #2</h2>
                 <ol>

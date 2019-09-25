@@ -8,9 +8,9 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
- body {
-   background: url('../../images/background.svg') center center no-repeat #eee;
- }
+body {
+ background: #eee;
+}
 
 .reveal {
   font-family: "Raleway", Helvetica, sans-serif;
