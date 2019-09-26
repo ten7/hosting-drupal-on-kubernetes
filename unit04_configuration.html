@@ -26,13 +26,296 @@
 <div class="reveal">
     <div class="slides">
         <section>
-            <section>
+            <section data-background="images/background.svg" data-background-size="contain">
                 <h1><small>Unit #4</small><br/>Configuration</h1>
                 <small><br/>use &larr;&uarr;&darr;&rarr; or &lt;space&gt;</small>
             </section>
         </section>
         <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Passing config</h1>
+            </section>
             <section>
+                <h2>Methods</h2>
+                <ol>
+                    <li class="fragment">Bake into image</li>
+                    <li class="fragment">Use environment variables</li>
+                    <li class="fragment">Mount config files</li>
+                </ol>
+            </section>
+            <section>
+                <h2>Bake into image</h2>
+                <p class="fragment">Limited, can only change by redeploying</p>
+                <p class="fragment">Insecure, encourages sharing</p>
+            </section>
+            <section>
+                <h2>Environment vars</h2>
+                <p class="fragment">Better for individual values, not complex files</p>
+                <p class="fragment">Insecure!</p>
+            </section>
+            <section>
+                <h2>Mounting files</h2>
+                <p class="fragment">Good for simple and complex config</p>
+                <p class="fragment">Secure, subject to user permissions</p>
+                <p class="fragment">Commonly used by applications already</p>
+            </section>
+            <section>
+                <h2>Sharing config</h2>
+                <p class="fragment">Only for key values as needed</p>
+                <p class="fragment">Write-once, use everywhere</p>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Defining config</h1>
+            </section>
+            <section>
+                <h2>Secrets</h2>
+                <p class="fragment">Stores config values, small files</p>
+            </section>
+            <section>
+                <h2>Encrypted</h2>
+                <p class="fragment">Stored encrypted within k8s</p>
+                <p class="fragment">Only decrypted on mounting in pod</p>
+            </section>
+            <section>
+                <h2>Defined separately</h2>
+                <p class="fragment">Secrets are their own object...</p>
+                <p class="fragment">...not part of a Deployment or Statefulset</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: drupal-db
+type: Opaque
+data:
+  drupal-db-password.txt: YWJldHRlcnBhc3N3b3JkdGhhbnRoaXM=</code></pre>
+            </section>
+            <section>
+                <h2>Data section</h2>
+                <p class="fragment">Defines one or more individual values</p>
+                <p class="fragment">Each mounted as a separate file in pod</p>
+            </section>
+            <section>
+                <h2>base64 encoding</h2>
+                <p class="fragment">Each <code>data</code> item is bas64 encoded</p>
+                <p class="fragment">Makes creation clumsy</p>
+            </section>
+            <section>
+                <h2>String Data</h2>
+                <p class="fragment">Assume values are <strong>not</strong> base64 encoded</p>
+                <p class="fragment">Encoded on save, becomes <code>data</code> afterward</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: drupal-db
+type: Opaque
+stringData:
+  drupal-db-password.txt: "abetterpasswordthanthis"</code></pre>
+            </section>
+            <section>
+                <h2>Same management</h2>
+                <p class="fragment"><code>kubectl get secret</code></p>
+                <p class="fragment"><code>kubectl describe secret</code> <em>name</em></p>
+                <p class="fragment"><code>kubectl edit secret</code> <em>name</em></p>
+            </section>
+            <section>
+                <h2>Encoded on edit</h2>
+                <p class="fragment">Values aren't base64 decoded</p>
+                <p class="fragment">Requires special editor, or manual work</p>
+            </section>
+            <section>
+                <h2>Better for values</h2>
+                <p class="fragment">Okay for small files, but...</p>
+                <p class="fragment">...Secret can't be >1MB total!</p>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Bigger config</h1>
+            </section>
+            <section>
+                <h2>Configmaps</h2>
+                <p class="fragment">Use for whole files, sets of files</p>
+                <p class="fragment">Much, much larger storage limit</p>
+            </section>
+            <section>
+                <h2>Not encrypted!</h2>
+                <p class="fragment">Or base64 encoded!</p>
+                <p class="fragment">Easier to edit, but less secure</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+data:
+  flight-deck-db.yml: |
+    mysql_databases:
+    - name: "drupal"
+    mysql_users:
+    - name: "drupal"
+      host: "%"
+      passwordFile: "/config/drupal-db/drupal-db-password.txt"
+      priv: "drupal.*:ALL"</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+            <section>
+                <pre><code>$ kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
+
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get configmaps
+
+NAME    DATA   AGE
+mysql   1      10s
+
+$ kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql</code></pre>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Using Secrets, Configmaps</h1>
+            </section>
+            <section>
+                <h2>Mounted as volumes</h2>
+                <p class="fragment">Refer to Secret, Configmap name...</p>
+                <p class="fragment">...not volume claim name.</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            -  name: "vol-drupal-db"
+               mountPath: "/config/drupal-db"
+      volumes:
+        - name: "vol-drupal-db"
+          secret:
+            secretName: "drupal-db"</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+            <section>
+                <h2><code>Volumes</code></h2>
+                <p class="fragment">Tells k8s to treat definition as disk</p>
+                <p class="fragment">Defined on Deployment, Statefulset</p>
+            </section>
+            <section>
+                <h2><code>volumeMounts</code></h2>
+                <p class="fragment">Specifies where to mount volumes in pod</p>
+                <p class="fragment">Used by volume claims, and Secrets, Configmaps</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: "/var/lib/mysql"
+              name: "vol-mysql"
+            - mountPath: "/config/mysql"
+              name: "vol-flightdeck-db"
+            - mountPath: "/config/drupal-db"
+              name: "vol-drupal-db"
+      volumes:
+        - name: "vol-mysql"
+          persistentVolumeClaim:
+            claimName: mysql
+        - name: "vol-flightdeck-db"
+          configMap:
+            name: "mysql"
+        - name: "vol-drupal-db"
+          secret:
+            secretName: "drupal-db"
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+            <section>
+                <h2>Chaining files</h2>
+                <p class="fragment">Some config files can include other files</p>
+                <p class="fragment">Product and container specific</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+data:
+  flight-deck-db.yml: |
+    mysql_databases:
+    - name: "drupal"
+    mysql_users:
+    - name: "drupal"
+      host: "%"
+      passwordFile: "/config/drupal-db/drupal-db-password.txt"
+      priv: "drupal.*:ALL"</code></pre>
+            </section>
+            <section>
+                <h2>What about Drupal?</h2>
+                <ul>
+                    <li class="fragment">Create configmap of <code>settings.local.php</code></li>
+                    <li class="fragment">Customize container entrypoint</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Custom entrypoints</h2>
+                <p class="fragment">Better, does more start-up tasks</p>
+                <p class="fragment">Requires deeper Docker knowledge</p>
+            </section>
+            <section>
+                <h2>Example</h2>
+                <p class="fragment"><code>ten7/flight-deck-drupal</code></p>
+                <p class="fragment"><a href="https://github.com/ten7/flight-deck-drupal">github.com/ten7/flight-deck-drupal</a></p>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
                 <h2>Lab #4</h2>
                 <ol>
                     <li>Create Secret, Configmap</li>

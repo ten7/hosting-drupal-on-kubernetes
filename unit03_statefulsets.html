@@ -26,14 +26,14 @@
 <div class="reveal">
     <div class="slides">
         <section>
-            <section>
+            <section data-background="images/background.svg" data-background-size="contain">
                 <h1><small>Unit #3</small><br/>Statefulsets</h1>
                 <small><br/>use &larr;&uarr;&darr;&rarr; or &lt;space&gt;</small>
             </section>
         </section>
         <section>
-            <section>
-                <h2>Where Deployments fail</h2>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Where Deployments fail</h1>
             </section>
             <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer01.png" data-background-size="contain">
                 &nbsp;
@@ -88,8 +88,8 @@
             </section>
         </section>
         <section>
-            <section>
-                <h2>Something...state-ier</h2>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Something...<br />state-ier</h1>
             </section>
             <section>
                 <h2>Statefulsets</h2>
@@ -134,7 +134,7 @@ spec:
             </section>
         </section>
         <section>
-            <section>
+            <section data-background="images/background.svg" data-background-size="contain">
                 <h1>Do we need a Service?</h1>
             </section>
             <section>
@@ -170,8 +170,8 @@ spec:
             </section>
         </section>
         <section>
-            <section>
-                <h2>Storage</h2>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Storage</h1>
             </section>
             <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks01.png" data-background-size="contain">
                 &nbsp;
@@ -257,6 +257,104 @@ spec:
       labels:
         app: mysql
     spec:
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Permissions</h1>
+            </section>
+            <section>
+                <h2>Who owns the disk?</h2>
+                <p class="fragment">The unix <code>root</code> account</p>
+                <p class="fragment">Causes problems if containers run as non-root</p>
+            </section>
+            <section>
+                <h2>Masking ownership</h2>
+                <p class="fragment">Mount disk as group...</p>
+                <p class="fragment">...and run the user as part of that group.</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80</code></pre>
+            </section>
+            <section>
+                <h2><code>securityContext</code></h2>
+                <p class="fragment">Allows us to set special permission options</p>
+                <p class="fragment"><code>fsGroup</code> masks disk, apples GID to user</p>
+            </section>
+            <section>
+                <h2>Brute-force method</h2>
+                <p class="fragment">Run a container as root first...</p>
+                <p class="fragment">And <code>chown</code> the files.</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+        - name: "fix-pvc-permissions"
+          image: "alpine:3.9"
+          command:
+            - "sh"
+            - "-c"
+            - "chown -R 1000:1000 /var/lib/mysql"
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
       containers:
         - name: "db"
           image: "ten7/flight-deck-db:develop"
