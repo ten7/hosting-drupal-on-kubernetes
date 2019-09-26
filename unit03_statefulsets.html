@@ -33,6 +33,254 @@
         </section>
         <section>
             <section>
+                <h2>Where Deployments fail</h2>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer04.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer06.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer07.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer08.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer09.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer10.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Load Balancing</h2>
+                <p class="fragment">Not all apps are compatible!</p>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlLoadBalancer05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlHostname01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlHostname02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlHostname03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Predictable hostnames</h2>
+                <p class="fragment">Needed for none load-balancing apps</p>
+                <p class="fragment">Not possible with Deployments</p>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Something...state-ier</h2>
+            </section>
+            <section>
+                <h2>Statefulsets</h2>
+                <p class="fragment">Intended for "stateful" applications</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+            <section>
+                <h2>Like a Deployment</h2>
+                <p class="fragment"><code>kubectl get statefulsets</code></p>
+                <p class="fragment"><code>kubectl describe statefulset</code> <em>name</em></p>
+                <p class="fragment"><code>kubectl edit statefulset</code> <em>name</em></p>
+            </section>
+            <section>
+                <h2>Fault tolerant</h2>
+                <p class="fragment">New pod assumes "place" of failed pod</p>
+                <p class="fragment">Includes hostname and volumes</p>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h1>Do we need a Service?</h1>
+            </section>
+            <section>
+                <h2>Yes!</h2>
+                <p class="fragment">Service advertises network accessibility</p>
+                <p class="fragment">But <strong>not</strong> load balancing</p>
+            </section>
+            <section>
+                <h2>Headless Services</h2>
+                <p class="fragment">Advertises access</p>
+                <p class="fragment">No load balancing</p>
+            </section>
+            <section>
+                <pre><code>---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  clusterIP: None
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+  selector:
+    app: mysql</code></pre>
+            </section>
+            <section>
+                <h2>How is this headless?</h2>
+                <p class="fragment"><code>clusterIP: None</code></p>
+                <p class="fragment">Disables any load balancing</p>
+                <small class="fragment">Looks weird, but okay!</small>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Storage</h2>
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks01.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks02.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks03.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks04.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section data-transition="none" data-background-transition="none" data-background="images/unit03/mysqlDisks05.png" data-background-size="contain">
+                &nbsp;
+            </section>
+            <section>
+                <h2>Volumes</h2>
+                <p class="fragment">Managed disk storage</p>
+                <p class="fragment">Allocated as an object, mounted in pod</p>
+            </section>
+            <section>
+                <h2>Allocation</h2>
+                <ol>
+                    <li class="fragment">Persistent Volume Claim</li>
+                    <li class="fragment">Volume Claim template on Statefulset</li>
+                </ol>
+            </section>
+            <section>
+                <h2>Volume Claim Template</h2>
+                <p class="fragment">Allocates disk for each replica</p>
+                <p class="fragment">Disk reattached if pod is deleted, restarted</p>
+                <p class="fragment">Best for MySQL replicated set up</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+
+...
+
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+                </code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+            <section>
+                <h2>Sharability</h2>
+                <p class="fragment">Specified by <code>accessModes</code></p>
+                <p class="fragment">Most managed k8s do <strong>not</strong> support multi-writer!</p>
+            </section>
+            <section>
+                <h2>Requests</h2>
+                <p class="fragment">Specifies how to allocate the disk</p>
+                <p class="fragment">Size, class, other host-specific options</p>
+            </section>
+            <section>
+                <h2>Mounting</h2>
+                <p class="fragment">Volume must be mounted into pod</p>
+            </section>
+            <section>
+                <pre><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi</code></pre>
+                <small class="fragment">(Scroll down.)</small>
+            </section>
+        </section>
+        <section>
+            <section>
                 <h2>Lab #3</h2>
                 <ol>
                     <li>Create Statefulset YAML</li>

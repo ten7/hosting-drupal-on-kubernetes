@@ -196,11 +196,12 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql
 Mounting a Configmap inside a Statefulset is the largely the same process as adding a Secret to a Deployment:
 
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
-2. Update the `Statefulset` definition to add the following under the `volumes` section:
+2. Update the `Statefulset` definition to add the `volumes` section. It should be at the indent level as `containers`:
 ```yaml
-- name: "vol-flightdeck-db"
-  configMap:
-    name: "mysql"
+volumes:
+  - name: "vol-flightdeck-db"
+    configMap:
+      name: "mysql"
 ```
 3. Update the `Statefulset` definition to add the following under the `volumeMounts` section:
 ```yaml

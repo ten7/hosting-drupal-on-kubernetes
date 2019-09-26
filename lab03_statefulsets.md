@@ -162,7 +162,7 @@ spec:
             claimName: mysql
   volumeClaimTemplates:
     - metadata:
-        name: vol-mysql
+        name: mysql
       spec:
         accessModes:
           - ReadWriteOnce
@@ -318,10 +318,6 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: vol-mysql
-      volumes:
-        - name: vol-mysql
-          persistentVolumeClaim:
-            claimName: mysql
   volumeClaimTemplates:
     - metadata:
         name: vol-mysql
