@@ -358,7 +358,7 @@ Now that we have a database backed by a persistent disk, we should be able to co
 
 1. Using a web browser, navigate to the IP address provided by the web portal.
 2. After a moment, you should be redirected to the Drupal installation page. Click `Save and Continue`.
-3. Continue through the installation process until you reach the **Database configuration** page.
+3. Choose the **Standard** profile. Continue through the installation process until you reach the **Database configuration** page.
 4. For the **Database type** select **MySQL**.
 5. For the **Database name** enter `drupal`.
 6. For the **Database username** enter `drupal`.
