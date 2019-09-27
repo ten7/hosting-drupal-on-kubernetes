@@ -66,13 +66,13 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe deployment web
 
 The `kubectl apply` command can be used multiple times against the same definitions, it doesn't need to only be used for creation. Sometimes, however, we need to modify a Kubernetes definition directly to make a critical change or to try out different configuration options to solve a problem. For this, we can use `kubectl edit`.
 
-1. Edit the deployment definition:
+1. Edit the deployment definition (on Windows, this will open Notepad):
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit deployment web
 ```
 2. Notice that in addition to what was in your file, multiple additional items and formatting has been applied to your deployment definition. This is normal.
 3. Locate the `replicas` key. Change the value from `1` to `3`.
-4. Save the file.
+4. Save the file and close the editor.
 5. List the deployments again, this time you'll notice that multiple items are listed as `READY`:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get deployments
@@ -252,7 +252,7 @@ $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
 NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 web    ClusterIP   10.245.46.160   <none>        80/TCP    3m13s
 ```
-8. Use `kubectl describe` to get further details on our service:
+8. You may see one than one service definition, That's okay! Kubernetes often creates some definitions for it's own use. Use `kubectl describe` to get further details on our `web` service:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe service web
 
@@ -273,7 +273,7 @@ Events:            <none>
 
 ## Making the service publicly accessible
 
-When we `describe`d our Service, you may have noticed two IP addresses listed in the output. If you try to connect to either using your browser, however, you may not get to our pods. This is because by default, the Service allocates a "cluster IP". For many hosting providers, this address only works within the firewalled environment of the clutser, and not the public internet. To make it accessible, we need to change how the service externalizes itself.
+When we `describe`d our Service, you may have noticed two IP addresses listed in the output. If you try to connect to either using your browser, however, you may not get to our pods. This is because by default, the Service allocates a "cluster IP". For many hosting providers, this address only works within the firewalled environment of the cluster, and not the public internet. To make it accessible, we need to change how the service externalizes itself.
 
 1. Using a text edit, open the `web.yml` file we created earlier.
 2. Alter the Service definition, adding `type: LoadBalancer` under the `spec`:
