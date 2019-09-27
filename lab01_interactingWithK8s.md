@@ -11,7 +11,15 @@ In this lab we'll:
 
 ## Installing kubectl
 
-There are several methods to install `kubectl` depending on your preference and platform. The [Kubernetes website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos) specifies several different methods with which you may install `kubectl`. Often, however, you will want to also install Docker so that you may build and run your containers locally. Docker for Mac and Docker for Windows include `kubectl` out of the box.
+There are several methods to install `kubectl` depending on your preference and platform. The [Kubernetes website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos) specifies several different methods with which you may install `kubectl`: 
+
+* Use a downloaded binary ("dist")
+* Use a package manager such as Homebrew or Chocolatey.
+* Install Docker for Mac or Docker for Windows.
+
+Your instructor may recommend a particular method depending on your class. 
+
+Often, however, you will want to also install Docker so that you may build and run your containers locally. Docker for Mac and Docker for Windows include `kubectl` out of the box.
 
 On MacOS:
 
