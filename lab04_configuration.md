@@ -15,7 +15,7 @@ In this lab we'll:
 Secrets aren't considered a part of a Deployment or a Statefulset. They are their own, independent definitions which must be created and managed separately.
 
 1. Using a text editor, create a new file `secrets.yml`.
-2. Edit the file to define a new Secret:
+2. Edit the file to define a new Secret. Use a **new** password of your own choosing. Do not use `drupal`:
 ```yaml
 apiVersion: v1
 kind: Secret
