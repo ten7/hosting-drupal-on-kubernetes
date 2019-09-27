@@ -2,17 +2,17 @@
 
 To run an application on Kubernetes, you need to provide it one or more  containers which power your workload. Historically, k8s has had several different methods of describing how to get that container in the cluster. In recent versions, however, many of those methods have converged into one k8s object type, a *Deployment*.
 
-A Deployment describes how what containers to run for the application, how many copies, where, and more. Deployments are used as templates to create instances of your application in the cluster, known as **pods**. When you modify the deployment, Kubernetes will update or re-create the pods to match the new definition.
+A Deployment describes what containers to run for the application, how many copies, where, and more. Deployments are used as templates to create instances of your application in the cluster, known as **pods**. When you modify the Deployment, Kubernetes will update or recreate the pods to match the new definition.
 
 In this lab we'll:
-* Create a new deployment by writing a YAML file.
+* Create a new Deployment by writing a YAML file.
 * Use `kubectl` to *apply* that file to our cluster.
 * Inspect the application as it's deployed, edit it, and delete it.
 * Create a service definition with which to access the service externally.
 
 ## Writing a definition
 
-While you can create a deployment definition directly using `kubectl`, it's often better to write a YAML file containing the definition locally. This way, you can add it to a git repository or other version control system.
+While you can create a Deployment definition directly using `kubectl`, it's often better to write a YAML file containing the definition locally. This way, you can add it to a git repository or other version control system.
 
 1. Using a text editor of your choice, create a new text file called `web.yml`.
 2. Create the basic structure of the definition as follows:
@@ -44,7 +44,7 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
-5. The `kubectl` command will validate your definition prior deployment. If there are errors, go back, edit the file, and try to apply it again.
+5. The `kubectl` command will validate your definition prior to deployment. If there are errors, go back, edit the file, and try to apply it again.
 
 ## Inspect the deployment
 
@@ -56,7 +56,7 @@ $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get deployments
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 web    1/1     1            1           8m52s
 ```
-2. Like with nodes, we can also describe the deployment:
+2. Like with nodes, we can also describe the Deployment:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" describe deployment web
 ```
@@ -64,16 +64,16 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe deployment web
 
 ## Edit the deployment
 
-The `kubectl apply` command can be used multiple times against the same definitions, it doesn't need to only be used for creation. Sometimes, however, we need to modify a Kubernetes definition directly to make a critical change or to try out different configuration options to solve a problem. For this, we can use `kubectl edit`.
+The `kubectl apply` command can be used multiple times against the same definitions; it doesn't need to only be used for creation. Sometimes, however, we need to modify a Kubernetes definition directly to make a critical change or to try out different configuration options to solve a problem. For this, we can use `kubectl edit`.
 
-1. Edit the deployment definition (on Windows, this will open Notepad):
+1. Edit the Deployment definition (on Windows, this will open Notepad):
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit deployment web
 ```
-2. Notice that in addition to what was in your file, multiple additional items and formatting has been applied to your deployment definition. This is normal.
+2. Notice that in addition to what was in your file, multiple additional items and formatting have been applied to your Deployment definition. This is normal.
 3. Locate the `replicas` key. Change the value from `1` to `3`.
 4. Save the file and close the editor.
-5. List the deployments again, this time you'll notice that multiple items are listed as `READY`:
+5. List the deployments again. This time you'll notice that multiple items are listed as `READY`:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get deployments
 
@@ -94,8 +94,8 @@ web-56c74df886-46wcf   1/1     Running   0          37m
 web-56c74df886-gpf9c   1/1     Running   0          3m13s
 web-56c74df886-kz95s   1/1     Running   0          3m13s
 ```
-2. Notice that there are three pods, each starting with our deployment name (`web`). There's one pod for each replica in our Deployment.
-3. Edit your deployment again, changing the `replicas` to `2`. Immediately list the pods again:
+2. Notice that there are three pods, each starting with our Deployment name (`web`). There's one pod for each replica in our Deployment.
+3. Edit your Deployment again, changing the `replicas` to `2`. Immediately list the pods again:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" edit deployment web
 
@@ -116,7 +116,7 @@ NAME                   READY   STATUS    RESTARTS   AGE
 web-56c74df886-46wcf   1/1     Running   0          48m
 web-56c74df886-gpf9c   1/1     Running   0          13m
 ```
-5. Let's try something fun -- let's *delete* a pod outright. Choose a pod from the list, then delete it:
+5. Let's try something fun: let's *delete* a pod outright. Choose a pod from the list, then delete it:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" delete pod web-56c74df886-46wcf
 ```
@@ -128,12 +128,12 @@ NAME                   READY   STATUS    RESTARTS   AGE
 web-56c74df886-gpf9c   1/1     Running   0          15m
 web-56c74df886-m27zq   1/1     Running   0          18s
 ```
-7. Didn't we delete that pod? We did! Notice, the pod name you deleted is no longer in the list. Instead, k8s replaced it with a new pod so our deployment remained consistent.
+7. Didn't we delete that pod? We did! Notice, the pod name you deleted is no longer in the list. Instead, k8s replaced it with a new pod so our Deployment remained consistent.
 
 
 ## Entering into the pod
 
-We can tell from the `kubectl` output that the pods that make up our Deployment are running, but we be sure they are functioning correctly? One way is to access them via a *remote shell*. For traditional servers, this would be something like ssh. For Kubernetes, however, we can login to individual pods using `kubectl exec`.
+We can tell from the `kubectl` output that the pods that make up our Deployment are running, but how can we be sure they're functioning correctly? One way is to access them via a *remote shell*. For traditional servers, this would be something like ssh. For Kubernetes, however, we can log in to individual pods using `kubectl exec`.
 
 1. First, list the pods running on our cluster:
 ```shell
@@ -187,7 +187,7 @@ exit
 
 We know Apache is running inside our container, but accessing it through a `kubectl exec` and then `curl` is...cumbersome at best. What we want is to access the site through a web browser! In order to do that, we need to create a *Service definition*.
 
-1. Using a text editor, open your the `web.yml` file you created earlier.
+1. Using a text editor, open the `web.yml` file you created earlier.
 2. Add the following to the end of the file:
 ```yaml
 ---
@@ -244,15 +244,15 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
-6. Like with Deployments, `kubectl` will validate the format of our Service prior to applying it to the cluster. If there are errors, go back and correct them and try to apply again.
-7. Once applied, we can list our services just as we did our deployments:
+6. As with Deployments, `kubectl` will validate the format of our Service prior to applying it to the cluster. If there are errors, go back and correct them and try to apply again.
+7. Once applied, we can list our services just as we did our Deployments:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
 
 NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 web    ClusterIP   10.245.46.160   <none>        80/TCP    3m13s
 ```
-8. You may see one than one service definition, That's okay! Kubernetes often creates some definitions for it's own use. Use `kubectl describe` to get further details on our `web` service:
+8. You may see one than one service definition——that's okay! Kubernetes often creates some definitions for its own use. Use `kubectl describe` to get further details on our `web` service:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe service web
 
@@ -273,9 +273,9 @@ Events:            <none>
 
 ## Making the service publicly accessible
 
-When we `describe`d our Service, you may have noticed two IP addresses listed in the output. If you try to connect to either using your browser, however, you may not get to our pods. This is because by default, the Service allocates a "cluster IP". For many hosting providers, this address only works within the firewalled environment of the cluster, and not the public internet. To make it accessible, we need to change how the service externalizes itself.
+When we `describe`d our Service, you may have noticed two IP addresses listed in the output. If you try to connect to either using your browser, however, you may not get to our pods. This is because by default, the Service allocates a "cluster IP." For many hosting providers, this address only works within the firewalled environment of the cluster, and not the public internet. To make it accessible, we need to change how the Service externalizes itself.
 
-1. Using a text edit, open the `web.yml` file we created earlier.
+1. Using a text editor, open the `web.yml` file we created earlier.
 2. Alter the Service definition, adding `type: LoadBalancer` under the `spec`:
 ```yaml
 ---
@@ -300,7 +300,7 @@ deployment.apps/web unchanged
 service/web configured
 ```
 4. Return to the DigitalOcean web portal. Navigate to **Manage** &gt; **Networking** and open the **Load Balancers** tab.
-5. Notice that a new load balancer is being allocated to power access. This external service often will have additional cost associated with it depending on your hosting provider, so we need to create `LoadBalanacer` type Services is discretion.
+5. Notice that a new load balancer is being allocated. Depending on your hosting provider, this external service often will have additional cost associated with it, so create `LoadBalancer`-type Services with discretion.
 6. Wait for the new load balancer to finish allocating. This may take several minutes.
 7. When finished, examine the **IP Address** column, there should be a new, publicly available IP address for your load balancer.
 8. Let's cross check that with `kubectl`:
