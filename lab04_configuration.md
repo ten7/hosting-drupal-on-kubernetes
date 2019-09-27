@@ -42,7 +42,8 @@ drupal-db             Opaque                                1      7s
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit secret drupal-db
 ```
-6. Notice that the password we entered earlier is no longer in plaintext. It's been base64 encoded. Also, the `stringData` key was replaced with a `data` key.
+7. Notice that the password we entered earlier is no longer in plaintext. It's been base64 encoded. Also, the `stringData` key was replaced with a `data` key.
+8. Close the editor.
 
 ## Update web deployment
 
