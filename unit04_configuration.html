@@ -62,7 +62,7 @@
             <section>
                 <h2>Sharing config</h2>
                 <p class="fragment">Only for key values as needed</p>
-                <p class="fragment">Write-once, use everywhere</p>
+                <p class="fragment">Write once, use everywhere</p>
             </section>
         </section>
         <section>
@@ -75,7 +75,7 @@
             </section>
             <section>
                 <h2>Encrypted</h2>
-                <p class="fragment">Stored encrypted within k8s</p>
+                <p class="fragment">Stored, encrypted within k8s</p>
                 <p class="fragment">Only decrypted on mounting in pod</p>
             </section>
             <section>
@@ -125,7 +125,7 @@ stringData:
             <section>
                 <h2>Encoded on edit</h2>
                 <p class="fragment">Values aren't base64 decoded</p>
-                <p class="fragment">Requires special editor, or manual work</p>
+                <p class="fragment">Requires special editor or manual work</p>
             </section>
             <section>
                 <h2>Better for values</h2>
@@ -222,7 +222,7 @@ spec:
             <section>
                 <h2><code>volumeMounts</code></h2>
                 <p class="fragment">Specifies where to mount volumes in pod</p>
-                <p class="fragment">Used by volume claims, and Secrets, Configmaps</p>
+                <p class="fragment">Used by volume claims, Secrets, and Configmaps</p>
             </section>
             <section>
                 <pre><code>apiVersion: apps/v1
@@ -300,12 +300,12 @@ data:
                 <h2>What about Drupal?</h2>
                 <ul>
                     <li class="fragment">Create configmap of <code>settings.local.php</code></li>
-                    <li class="fragment">Customize container entrypoint</li>
+                    <li class="fragment">Customize container entry point</li>
                 </ul>
             </section>
             <section>
                 <h2>Custom entrypoints</h2>
-                <p class="fragment">Better, does more start-up tasks</p>
+                <p class="fragment">Better, does more startup tasks</p>
                 <p class="fragment">Requires deeper Docker knowledge</p>
             </section>
             <section>
