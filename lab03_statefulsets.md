@@ -1,6 +1,6 @@
 # Statefulsets
 
-Deployments fulfill most needs we have for running workloads on Kubernetes. Deployments, however, assume that each pod is temporary, replaceable, and arbitrarily scaleable. This is why pod names created from a Deployment each start with the Deployment name, but end in a random series of characters. Deployments are said to be "stateless" by default. Sometimes, however, we *do* need something stateful, such as a file server or a database. For that, we have Statefulsets.
+Deployments fulfill most needs we have for running workloads on Kubernetes. Deployments, however, assume that each pod is temporary, replaceable, and arbitrarily scalable. This is why pod names created from a Deployment each start with the Deployment name, but end in a random series of characters. Deployments are said to be "stateless" by default. Sometimes, however, we *do* need something stateful, such as a file server or a database. For that, we have Statefulsets.
 
 In this lab, we'll:
 * Create a Statefulset and Service for a MySQL database
@@ -42,7 +42,7 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
 ```
-4. Just like every definition we've worked with thusfar, `kubectl` will validate your file before applying it. If there are errors, go back and correct them, and re-apply the file.
+4. Just like every definition we've worked with thus far, `kubectl` will validate your file before applying it. If there are errors, go back and correct them, and reapply the file.
 
 ## Working with Statefulsets
 
@@ -63,7 +63,7 @@ NAME                   READY   STATUS    RESTARTS   AGE
 mysql-0                1/1     Running   0          87s
 web-56c74df886-gpf9c   1/1     Running   0          20h
 ```
-3. Notice how once applied, a pod managed from a Deployment and a pod managed from a Statefulset are the same, with one key difference: The Statefulset pod has a deterministic hostname, `mysql-0`.
+3. Notice how once applied, a pod managed from a Deployment and a pod managed from a Statefulset are the same, with one key difference: the Statefulset pod has a deterministic hostname, `mysql-0`.
 4. Let's get the details for the statefulset:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" describe statefulset mysql
@@ -97,7 +97,7 @@ mysql-2                1/1     Running             0          5m11s
 web-56c74df886-gpf9c   1/1     Running             0          20h
 ```
 9. Notice that instead of creating a new pod, `mysql-3`, it recreates the original `mysql-1` pod in place. This is another key feature of Statefulsets.
-10. Finally, let's scale down the Statefulset to it's original size of `1`. We can do this by using `kubectl edit`, or even `kubectl apply`, but we can also use another command:
+10. Finally, let's scale down the Statefulset to its original size of `1`. We can do this by using `kubectl edit`, or even `kubectl apply`, but we can also use another command:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" scale statefulset/mysql --replicas=1
 
@@ -116,7 +116,7 @@ web-56c74df886-gpf9c   1/1     Running       0          20h
 
 ## Persistent volumes
 
-When we delete a pod, we delete everything with it, including all users, files, even databases. To prevent this, we need to create a *persistent volume* to store the data permanently. While we can allocate persistent volumes independent of any other k8s object, it's often useful to allocate them as part of a Statefulset. This way, each pod created by the Statefulset will also have the same size volume at the same mountpoints. The disks cannot be shared, but they will be preserved in the case the pod is deleted and needs to be recreated.
+When we delete a pod, we delete everything with it, including all users, files, and even databases. To prevent this, we need to create a *persistent volume* to store the data permanently. While we can allocate persistent volumes independent of any other k8s object, it's often useful to allocate them as part of a Statefulset. This way, each pod created by the Statefulset will also have the same size volume at the same mountpoints. The disks cannot be shared, but they will be preserved in case the pod is deleted and needs to be recreated.
 
 1. Using a text editor, edit the `mysql.yml` file we created earlier.
 2. Update the Statefulset definition to the following:
@@ -170,13 +170,13 @@ spec:
           requests:
             storage: 10Gi
 ```
-3. Save the file, apply it to the cluster.
+3. Save the file, and apply it to the cluster.
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
 
 The StatefulSet "mysql" is invalid: spec: Forbidden: updates to statefulset spec for fields other than 'replicas', 'template', and 'updateStrategy' are forbidden
 ```
-4. Wait, what? Why can't we update it? It turns out that this is another key feature of Statefulsets; once created, they may only be modified in a few specific ways.
+4. Wait, what? Why can't we update it? It turns out that this is another key feature of Statefulsets: once created, they may only be modified in a few specific ways.
 5. To make the change we need, we need to delete the Statefulset first:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" delete statefulset mysql
@@ -304,7 +304,7 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
 ```
-6. List all the services on your cluster, there should now be two:
+6. List all the services on your cluster. There should now be two:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" get services      
 
@@ -325,4 +325,4 @@ Now that we have a database backed by a persistent disk, we should be able to co
 6. For the **Database username** enter `drupal`.
 7. For the **Database password** also enter `drupal`.
 8. Open the **Advanced options** fieldset. For the **Host**, enter `mysql-0.mysql`.
-9. Allow Drupal to install. On the **Configure site** page, enter any remaining options -- including an administrator password -- to complete the installation.
+9. Allow Drupal to install. On the **Configure site** page, enter any remaining options--including an administrator password--to complete the installation.
