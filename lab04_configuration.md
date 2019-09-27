@@ -1,6 +1,6 @@
 # Configuration
 
-When working with pods in Kubernetes, there are three basic ways to manage configuration. We could build the configuration into the pod's image, but this is limiting and results in shared credentials. We could use Docker Compose-style envrionment variables, but this is insecure. The last option is to mount configuration files when the pod starts. This is the most complex option, but it offers acceptable security with broad and straightforward support.
+When working with pods in Kubernetes, there are three basic ways to manage configuration. We could build the configuration into the pod's image, but this is limiting and results in shared credentials. We could use Docker Compose-style environment variables, but this is insecure. The last option is to mount configuration files when the pod starts. This is the most complex option, but it offers acceptable security with broad and straightforward support.
 
 It's this latter method that Kubernetes uses to manage and provide configuration. This is accomplished through *Secrets* and *ConfigMaps*.
 
@@ -12,7 +12,7 @@ In this lab we'll:
 
 ## Create secret for database credentials
 
-Secrets aren't considered a part of a Deployment or a Statefulset. They are their own, independent definitions which must be created and managed separately.
+Secrets aren't considered a part of a Deployment or a Statefulset. They are their own independent definitions which must be created and managed separately.
 
 1. Using a text editor, create a new file `secrets.yml`.
 2. Edit the file to define a new Secret. Use a **new** password of your own choosing. Do not use `drupal`:
@@ -29,7 +29,7 @@ stringData:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/secrets.yml
 ```
-4. Although our `secrets.yml` file is pretty simple, it's still subject to the same validation as are Deployments, Services, and Statefulsets. If there are errors, go back and correct them, then, reapply the file.
+4. Although our `secrets.yml` file is pretty simple, it's still subject to the same validation as Deployments, Services, and Statefulsets. If there are errors, go back and correct them, then reapply the file.
 5. List all the secrets on the cluster:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get secrets
@@ -38,7 +38,7 @@ NAME                  TYPE                                  DATA   AGE
 default-token-8kf7b   kubernetes.io/service-account-token   3      3d19h
 drupal-db             Opaque                                1      7s
 ```
-6. Now, edit the secret:
+6. Now, edit the Secret:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit secret drupal-db
 ```
@@ -124,8 +124,8 @@ web-5ddcb78d8-p5lqb   1/1     Running   0          19m
 
 At first, recreatng the pods seems like an excessive response to a configuration change. Yet, this is an intentional behavior. Pods are meant to be emphemeral. Even Statefulset pods should be designed to survive a pod being deleted and recreated. Let's examine the new web pod to see how our Secret is presented inside the pod:
 
-1. Examine the `web.yml` file. Notice that under `volumeMounts`, we mounted the secret under `/config/drupal-db`.
-2. Return to the List the pods in your cluster:
+1. Examine the `web.yml` file. Notice that under `volumeMounts`, we mounted the Secret under `/config/drupal-db`.
+2. Return to the list of the pods in your cluster:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
 ```
@@ -173,7 +173,7 @@ data:
       passwordFile: "/config/drupal-db/drupal-db-password.txt"
       priv: "drupal.*:ALL"
 ```
-3. Notice that like Secrets, a Configmap can host multiple files, each is an item under the `data` list.
+3. Notice that like Secrets, a Configmap can host multiple files; each is an item under the `data` list.
 4. Apply the `configmaps.yml` file to the cluster:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
@@ -198,7 +198,7 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql
 Mounting a Configmap inside a Statefulset is the largely the same process as adding a Secret to a Deployment:
 
 1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
-2. Update the `Statefulset` definition to add the `volumes` section. It should be at the indent level as `containers`:
+2. Update the `Statefulset` definition to add the `volumes` section. It should be at the same indent level as `containers`:
 ```yaml
 volumes:
   - name: "vol-flightdeck-db"
@@ -210,11 +210,11 @@ volumes:
 - mountPath: "/config/mysql"
   name: "vol-flightdeck-db"
 ```
-4. Save the file, but do **not** apply it yet! We have more we need to do first...
+4. Save the file, but do **not** apply it yet! We have more we need to do first.
 
 ## Reusing secrets
 
-Notice that when we created the Configmap, we didn't actually put the password for the database in the file. That's because the `ten7/flight-deck-db:develop` container can be instructed to look for the password in another file using `passwordFile`. Since we already have the password in a Secret, we we're going to use the same one we created for our `web` deployment.
+Notice that when we created the Configmap, we didn't actually put the password for the database in the file. That's because the `ten7/flight-deck-db:develop` container can be instructed to look for the password in another file using `passwordFile`. Since we already have the password in a Secret, we're going to use the same one we created for our `web` deployment.
 
 
 1. Using a text editor, open the `mysql.yml` file if you haven't already done so.
@@ -304,7 +304,7 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/mysql.yml
 ```
-6. List the pods in the cluster, notice that the mysql pod is being terminated and recreated:
+6. List the pods in the cluster; notice that the mysql pod is being terminated and recreated:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pods
 
@@ -341,7 +341,7 @@ data:
     MYSQL_USER: "drupal"
     MYSQL_PASS_FILE: "/config/drupal-db/drupal-db-password.txt"
 ```
-3. Save an apply the file to the cluster:
+3. Save and apply the file to the cluster:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/configmaps.yml
 ```
@@ -423,7 +423,7 @@ web-57dd9c55b-tgw6l   1/1     Running   0          28s
 
 With everything done, we can now do the final check. Does Drupal have the right database credientals? Let's find out!
 
-1. Using a web browser, visit visit the DigitalOcean web portal.
+1. Using a web browser, visit the DigitalOcean web portal.
 2. Navigate to **Manage** &gt; **Networking** and open the **Load Balancers** tab.
 3. Copy the IP address of your load balancer.
-4. Using a web browser, open the IP address. Notice, your Drupal site is still there!
+4. Using a web browser, open the IP address. Notice that your Drupal site is still there!
