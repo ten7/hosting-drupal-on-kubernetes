@@ -1,6 +1,6 @@
 # Interacting with Kubernetes
 
-Kubernetes is an orchestrator which allows you to run your container-based workloads dynamically in a clustered environment. It provides provisioning, scheduling, and management so that you can focus on your workload, and not your infrastructure. The primary means we interact with Kubernetes -- often called "k8s" for short -- is the `kubectl` command. This command allows you to create, inspect, edit, and delete any object within your Kubernetes cluster.
+Kubernetes is an orchestrator which allows you to run your container-based workloads dynamically in a clustered environment. It provides provisioning, scheduling, and management so that you can focus on your workload, and not your infrastructure. The primary means we interact with Kubernetes (often called "k8s" for short) is the `kubectl` command. This command allows you to create, inspect, edit, and delete any object within your Kubernetes cluster.
 
 In this lab we'll:
 
@@ -37,22 +37,22 @@ On Windows:
 https://hub.docker.com/editions/community/docker-ce-desktop-windows
 ```
 2. Click **Get Docker**.
-3. Run the installer, follow on-screen instructions.
+3. Run the installer, following on-screen instructions.
 
 For Linux, typically you must install Docker and kubectl separately using your distribution's default package manager. Consult your distribution's documentation for instructions.
 
 ## Create hosting provider account or login
 
-Kubernetes is **not** a product which creates clusters, it acts as the cluster orchestrator once installed and configured. While k8s is an open source product which can be self-hosted, you may wish to "outsource" that work to a Kubernetes-centric hosting provider.
+Kubernetes is **not** a product which creates clusters; it acts as the cluster orchestrator once installed and configured. While k8s is an open source product which can be self-hosted, you may wish to "outsource" that work to a Kubernetes-centric hosting provider.
 
 This lab assumes we will be using DigitalOcean, although any Kubernetes hosting provider should work.
 
 1. If so directed, use your instructor's provided login link for this class.
-2. If not, navigate to `http://digitalocean.com` and follow on-screen instructions to login or create an account.
+2. If not, navigate to `http://digitalocean.com` and follow on-screen instructions to log in or create an account.
 
 ## Configure the cluster version and location
 
-Many hosting providers will allow you to create k8s clusters using an API. This is considered best practice for highly-automated, git-driven environments. For this class, however, we'll use the hosting provider's web portal to create the cluster using the UI.
+Many hosting providers will allow you to create k8s clusters using an API. This is considered best practice for highly automated, git-driven environments. For this class, however, we'll use the hosting provider's web portal to create the cluster using the UI.
 
 1. Using a web browser, navigate to DigitalOcean's web portal:
 ```
@@ -67,7 +67,7 @@ https://cloud.digitalocean.com
 
 Many hosting providers will provision individual worker machines which comprise your cluster as *node pools*. Each machine ("node") in the pool has the same hardware configuration, allowing you to create sets of machines to run particular workloads.
 
-1. Under **Choose a cluster capacity** enter a **Node Pool Name** of your choosing. You can **not** change this later.
+1. Under **Choose a cluster capacity** enter a **Node Pool Name** of your choosing. NOTE: You can **not** change this later.
 2. Select **Standard nodes** for the **Machine type**.
 3. For **Node Plan** select the smallest plan available.
 4. Enter `3` for the **Number nodes** to create three machines of the selected configuration.
@@ -82,11 +82,11 @@ Many hosting providers will provision individual worker machines which comprise 
 
 ## Authorizing kubectl
 
-The `kubectl` application interacts with Kubernetes through an API. As such, we often need to authenticate with that API to be certain we have the correct credentials and we are who we say we are. Different hosting providers have different authentication methods for `kubectl`, consult your hosting provider's documentation to find out which one is appropriate.
+The `kubectl` application interacts with Kubernetes through an API. As such, we often need to authenticate with that API to be certain we have the correct credentials and we are who we say we are. Different hosting providers have different authentication methods for `kubectl`, so consult your hosting provider's documentation to find out which one is appropriate.
 
-For DigitalOcean, a "kubeconfig" file may be downloaded from the web portal. This file contains the necessary authentication tokens. Note that this file also has a limited livespan. After 24 hours, credentials are often invalidated, requiring you to download a new kubeconfig file.
+For DigitalOcean, a "kubeconfig" file may be downloaded from the web portal. This file contains the necessary authentication tokens. NOTE: This file has a limited lifespan. After 24 hours, credentials are often invalidated, requiring you to download a new kubeconfig file.
 
-1. Using a web browser, login to the DigitalOcean web portal.
+1. Using a web browser, log in to the DigitalOcean web portal.
 2. Using the sidebar, navigate to **Manage** &gt; **Kubernetes**.
 3. Locate the cluster you created earlier in the list and click the cluster name.
 4. Scroll down and click the **Download Config File** button. Note the download location of this file.
