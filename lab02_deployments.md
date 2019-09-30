@@ -44,7 +44,7 @@ spec:
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" apply -f /path/to/web.yml
 ```
-5. The `kubectl` command will validate your definition prior to deployment. If there are errors, go back, edit the file, and try to apply it again.
+5. The `kubectl` command will validate your definition before applying it to the cluster. If there are errors, go back, edit the file, and try to apply it again.
 
 ## Inspect the deployment
 
@@ -252,7 +252,7 @@ $ kubectl --kubeconfig="/path/to/kubeconfig.yml" get services
 NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 web    ClusterIP   10.245.46.160   <none>        80/TCP    3m13s
 ```
-8. You may see one than one service definition——that's okay! Kubernetes often creates some definitions for its own use. Use `kubectl describe` to get further details on our `web` service:
+8. You may see one than one service definition —— that's okay! Kubernetes often creates some definitions for its own use. Use `kubectl describe` to get further details on our `web` service:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe service web
 

@@ -364,4 +364,4 @@ Now that we have a database backed by a persistent disk, we should be able to co
 6. For the **Database username** enter `drupal`.
 7. For the **Database password** also enter `drupal`.
 8. Open the **Advanced options** fieldset. For the **Host**, enter `mysql-0.mysql`.
-9. Allow Drupal to install. On the **Configure site** page, enter any remaining options--including an administrator password--to complete the installation.
+9. Allow Drupal to install. On the **Configure site** page, enter any remaining options -- including an administrator password -- to complete the installation.
