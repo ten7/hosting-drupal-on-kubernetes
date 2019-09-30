@@ -74,7 +74,7 @@
             <section>
                 <h2>Docker hub</h2>
                 <p class="fragment">Largest, shared container registry</p>
-                <p class="fragment">hub.docker.org</p>
+                <p class="fragment"><a href="http://hub.docker.com">hub.docker.org</a></p>
             </section>
             <section>
                 <h2>Downloader, beware!</h2>
@@ -206,12 +206,12 @@ metadata:
   labels:
     app: web
   name: web
-spec:
+spec:             # Deployment's spec start here.
   replicas: 1
   selector:
     matchLabels:
       app: web
-  template:
+  template:       # Pod template starts here.
     metadata:
       labels:
         app: web
@@ -323,25 +323,25 @@ web-56c74df886-kz95s   1/1     Running   0          3m13s</code></pre>
                 <p class="fragment">Creates internal DNS name</p>
             </section>
             <section>
-                <pre><code>apiVersion: v1
+                <pre><code>apiVersion: v1       # The version is different!
 kind: Service
 metadata:
   name: web
 spec:
-  ports:
+  ports:             # Service can have one or more ports
     - name: http
       port: 80
       protocol: TCP
-  selector:
+  selector:          # This looks familiar...
     app: web</code></pre>
             </section>
             <section>
                 <h2>Selector</h2>
-                <p class="fragment">Key-value pair defined on Service</p>
-                <p class="fragment">Used by <code>spec.selector</code> in Deployment</p>
+                <p class="fragment">Associates Deployments to Pods...</p>
+                <p class="fragment">...and Pods to Services</p>
             </section>
             <section>
-                <pre><code>apiVersion: apps/v1
+                <pre><code>apiVersion: apps/v1   # Deployment def starts here.
 kind: Deployment
 metadata:
   labels:
@@ -349,13 +349,12 @@ metadata:
   name: web
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: web
+  selector:           # Manages pods with label
+      app: web        # app=web
   template:
     metadata:
-      labels:
-        app: web
+      labels:         # Create pods with label
+        app: web      # app=web
     spec:
       containers:
         - image: ten7/flight-deck-drupal:latest
@@ -363,7 +362,7 @@ spec:
           ports:
             - containerPort: 80
 ---
-apiVersion: v1
+apiVersion: v1        # Service def starts here.
 kind: Service
 metadata:
   name: web
@@ -372,8 +371,8 @@ spec:
     - name: http
       port: 80
       protocol: TCP
-  selector:
-    app: web</code></pre>
+  selector:           # Route to pods with label
+    app: web          # app=web</code></pre>
             </section>
             <section>
                 <h2>YAML multidoc</h2>
@@ -406,7 +405,7 @@ spec:
       protocol: TCP
   selector:
     app: web
-  type: LoadBalancer</code></pre>
+  type: LoadBalancer   # Create external load balancer</code></pre>
             </section>
         </section>
         <section data-background="images/background.svg" data-background-size="contain">

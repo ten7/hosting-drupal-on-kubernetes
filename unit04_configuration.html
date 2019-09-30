@@ -200,27 +200,27 @@ spec:
       labels:
         app: web
     spec:
+      volumes:                            # Mount disks
+        - name: "vol-drupal-db"
+          secret:                         # Use Secret...
+            secretName: "drupal-db"       # ...with this name.
       containers:
         - image: ten7/flight-deck-drupal:latest
           name: web
           ports:
             - containerPort: 80
-          volumeMounts:
+          volumeMounts:                   # Mount volume at path.
             -  name: "vol-drupal-db"
-               mountPath: "/config/drupal-db"
-      volumes:
-        - name: "vol-drupal-db"
-          secret:
-            secretName: "drupal-db"</code></pre>
+               mountPath: "/config/drupal-db"</code></pre>
                 <small class="fragment">(Scroll down.)</small>
             </section>
             <section>
-                <h2><code>Volumes</code></h2>
+                <h2>Volumes section</h2>
                 <p class="fragment">Tells k8s to treat definition as disk</p>
                 <p class="fragment">Defined on Deployment, Statefulset</p>
             </section>
             <section>
-                <h2><code>volumeMounts</code></h2>
+                <h2>Volume Mounts section</h2>
                 <p class="fragment">Specifies where to mount volumes in pod</p>
                 <p class="fragment">Used by volume claims, Secrets, and Configmaps</p>
             </section>
@@ -240,6 +240,13 @@ spec:
       labels:
         app: mysql
     spec:
+      volumes:
+        - name: "vol-flightdeck-db"          # Volume for ConfigMap
+          configMap:
+            name: "mysql"
+        - name: "vol-drupal-db"              # Volume for Secret
+          secret:
+            secretName: "drupal-db"
       containers:
         - name: "db"
           image: "ten7/flight-deck-db:develop"
@@ -248,19 +255,12 @@ spec:
               name: mysql
               protocol: TCP
           volumeMounts:
-            - mountPath: "/var/lib/mysql"
+            - mountPath: "/var/lib/mysql"    # Mount for claim template...
               name: "vol-mysql"
-            - mountPath: "/config/mysql"
+            - mountPath: "/config/mysql"     # ...for ConfigMap...
               name: "vol-flightdeck-db"
-            - mountPath: "/config/drupal-db"
+            - mountPath: "/config/drupal-db" # ...and for the Secret.
               name: "vol-drupal-db"
-      volumes:
-        - name: "vol-flightdeck-db"
-          configMap:
-            name: "mysql"
-        - name: "vol-drupal-db"
-          secret:
-            secretName: "drupal-db"
   volumeClaimTemplates:
     - metadata:
         name: vol-mysql

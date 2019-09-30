@@ -98,14 +98,14 @@
             <section>
                 <pre><code>---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: StatefulSet         # Different kind
 metadata:
   name: mysql
 spec:
   selector:
     matchLabels:
       app: mysql
-  serviceName: mysql
+  serviceName: mysql      # Must match Service object
   replicas: 1
   template:
     metadata:
@@ -152,14 +152,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql       # Matches Statefulset.serviceName
 spec:
   clusterIP: None
   ports:
     - name: mysql
       port: 3306
       protocol: TCP
-  selector:
+  selector:         # Matches Statefulset.selector
     app: mysql</code></pre>
             </section>
             <section>
@@ -196,7 +196,7 @@ spec:
             <section>
                 <h2>Allocation</h2>
                 <ol>
-                    <li class="fragment">Persistent Volume Claim</li>
+                    <li class="fragment">Persistent Volume Claim (PVC)</li>
                     <li class="fragment">Volume Claim template on Statefulset</li>
                 </ol>
             </section>
@@ -213,16 +213,16 @@ metadata:
   name: mysql
 spec:
 
-...
+# Rest of spec goes here.
 
   volumeClaimTemplates:
     - metadata:
-        name: vol-mysql
+        name: vol-mysql    # Name of Claim
       spec:
         accessModes:
-          - ReadWriteOnce
+          - ReadWriteOnce  # Shareability
         resources:
-          requests:
+          requests:        # Requirements of request
             storage: 10Gi
                 </code></pre>
                 <small class="fragment">(Scroll down.)</small>
@@ -264,9 +264,9 @@ spec:
             - containerPort: 3306
               name: mysql
               protocol: TCP
-          volumeMounts:
-            - mountPath: /var/lib/mysql
-              name: vol-mysql
+          volumeMounts:                        # Mount volumes...
+            - mountPath: /var/lib/mysql        # ...at this path...
+              name: vol-mysql                  # ...with this claim.
   volumeClaimTemplates:
     - metadata:
         name: vol-mysql
@@ -310,8 +310,8 @@ spec:
       labels:
         app: web
     spec:
-      securityContext:
-        fsGroup: 1000
+      securityContext:    # Specify security options
+        fsGroup: 1000     # Mask disk with GID 1000
       containers:
         - image: ten7/flight-deck-drupal:latest
           name: web
@@ -319,7 +319,7 @@ spec:
             - containerPort: 80</code></pre>
             </section>
             <section>
-                <h2><code>securityContext</code></h2>
+                <code>securityContext</code>
                 <p class="fragment">Allows us to set special permission options</p>
                 <p class="fragment"><code>fsGroup</code> masks disk, applies GID to user</p>
             </section>
@@ -345,15 +345,15 @@ spec:
       labels:
         app: mysql
     spec:
-      initContainers:
+      initContainers:                    # Runs before containers
         - name: "fix-pvc-permissions"
           image: "alpine:3.9"
-          command:
+          command:                       # chmod all files
             - "sh"
             - "-c"
             - "chown -R 1000:1000 /var/lib/mysql"
           volumeMounts:
-            - mountPath: /var/lib/mysql
+            - mountPath: /var/lib/mysql  # Same mountpoint
               name: vol-mysql
       containers:
         - name: "db"
@@ -375,6 +375,51 @@ spec:
           requests:
             storage: 10Gi</code></pre>
                 <small class="fragment">(Scroll down.)</small>
+            </section>
+        </section>
+        <section>
+            <section data-background="images/background.svg" data-background-size="contain">
+                <h1>Managing Volumes</h1>
+            </section>
+            <section>
+                <h2>Claims aren't disks!</h2>
+                <p class="fragment">They <em>request</em> storage...</p>
+                <p class="fragment">...not embody it!</p>
+            </section>
+            <section>
+                <code>PersistantDisks</code>
+                <p class="fragment">Represent fulfilled claims</p>
+                <p class="fragment">Are <strong>not</strong> deleted with claim!</p>
+            </section>
+            <section>
+                <h2>Listing</h2>
+                <p class="fragment"><code>kubectl get persistentvolumes</code></p>
+                <p class="fragment">...or...</p>
+                <p class="fragment"><code>kubectl get pv</code></p>
+            </section>
+            <section>
+                <pre><code>$ kubectl --kubeconfig="/path/to/kubeconfig.yml" get pv
+NAME                      CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                        STORAGECLASS       REASON   AGE
+pvc-abcdef-0123-4567-89   10Gi       RWO            Delete           Bound    default/vol-mysql-mysql-0                   do-block-storage            79d
+</code></pre>
+                <small class="fragment">(Scroll right.)</small>
+            </section>
+            <section>
+                <h2>Deleting volumes</h2>
+                <p class="fragment">Must be done explicitly</p>
+            </section>
+            <section>
+                <h2>Avoid the portal!</h2>
+                <p class="fragment">Delete through <code>kubectl</code> instead</p>
+                <p class="fragment">May leave "dangling" PVs</p>
+            </section>
+            <section>
+                <h2>Make a backup first</h2>
+                <p class="fragment">Kubernetes has no "undo".</p>
+            </section>
+            <section>
+                <pre><code>$ kubectl --kubeconfig="/path/to/kubeconfig.yml" delete pv pvc-abcdef-0123-4567-89</code></pre>
+                <small class="fragment">(Scroll right.)</small>
             </section>
         </section>
         <section>
