@@ -156,13 +156,9 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: vol-mysql
-      volumes:
-        - name: vol-mysql
-          persistentVolumeClaim:
-            claimName: mysql
   volumeClaimTemplates:
     - metadata:
-        name: mysql
+        name: vol-mysql
       spec:
         accessModes:
           - ReadWriteOnce
@@ -283,7 +279,50 @@ spec:
 ```
 3. When finished, your `mysql.yml` file should look like this:
 ```yaml
-
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+        - name: "fix-pvc-permissions"
+          image: "alpine:3.9"
+          command:
+            - "sh"
+            - "-c"
+            - "chown -R 1000:1000 /var/lib/mysql"
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
+      containers:
+        - name: "db"
+          image: "ten7/flight-deck-db:develop"
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: vol-mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: vol-mysql
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
 ---
 apiVersion: v1
 kind: Service
@@ -319,7 +358,7 @@ Now that we have a database backed by a persistent disk, we should be able to co
 
 1. Using a web browser, navigate to the IP address provided by the web portal.
 2. After a moment, you should be redirected to the Drupal installation page. Click `Save and Continue`.
-3. Continue through the installation process until you reach the **Database configuration** page.
+3. Choose the **Standard** profile. Continue through the installation process until you reach the **Database configuration** page.
 4. For the **Database type** select **MySQL**.
 5. For the **Database name** enter `drupal`.
 6. For the **Database username** enter `drupal`.

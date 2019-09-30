@@ -99,7 +99,7 @@ data:
             </section>
             <section>
                 <h2>base64 encoding</h2>
-                <p class="fragment">Each <code>data</code> item is bas64 encoded</p>
+                <p class="fragment">Each <code>data</code> item is base64 encoded</p>
                 <p class="fragment">Makes creation clumsy</p>
             </section>
             <section>
@@ -255,9 +255,6 @@ spec:
             - mountPath: "/config/drupal-db"
               name: "vol-drupal-db"
       volumes:
-        - name: "vol-mysql"
-          persistentVolumeClaim:
-            claimName: mysql
         - name: "vol-flightdeck-db"
           configMap:
             name: "mysql"

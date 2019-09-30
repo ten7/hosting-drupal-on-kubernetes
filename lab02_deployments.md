@@ -300,7 +300,7 @@ deployment.apps/web unchanged
 service/web configured
 ```
 4. Return to the DigitalOcean web portal. Navigate to **Manage** &gt; **Networking** and open the **Load Balancers** tab.
-5. Notice that a new load balancer is being allocated. Depending on your hosting provider, this external service often will have additional cost associated with it, so create `LoadBalancer`-type Services with discretion.
+5. Notice that a new load balancer is being allocated. Depending on your hosting provider, this external service often will have additional cost associated with it. As a result, we need to create `LoadBalancer` type Services with discretion.
 6. Wait for the new load balancer to finish allocating. This may take several minutes.
 7. When finished, examine the **IP Address** column, there should be a new, publicly available IP address for your load balancer.
 8. Let's cross check that with `kubectl`:

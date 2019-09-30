@@ -15,7 +15,7 @@ In this lab we'll:
 Secrets aren't considered a part of a Deployment or a Statefulset. They are their own independent definitions which must be created and managed separately.
 
 1. Using a text editor, create a new file `secrets.yml`.
-2. Edit the file to define a new Secret:
+2. Edit the file to define a new Secret. Use a **new** password of your own choosing. Do not use `drupal`:
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -42,7 +42,8 @@ drupal-db             Opaque                                1      7s
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit secret drupal-db
 ```
-6. Notice that the password we entered earlier is no longer in plaintext. It's been base64 encoded. Also, the `stringData` key was replaced with a `data` key.
+7. Notice that the password we entered earlier is no longer in plaintext. It's been base64 encoded. Also, the `stringData` key was replaced with a `data` key.
+8. Close the editor.
 
 ## Update web deployment
 
@@ -190,6 +191,7 @@ mysql   1      10s
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql
 ```
 8. Notice that you may edit the contents of the Configmap in plaintext.
+9. Close the editor.
 
 ## Add the configmap to mysql Statefulset
 
@@ -215,7 +217,7 @@ volumes:
 Notice that when we created the Configmap, we didn't actually put the password for the database in the file. That's because the `ten7/flight-deck-db:develop` container can be instructed to look for the password in another file using `passwordFile`. Since we already have the password in a Secret, we're going to use the same one we created for our `web` deployment.
 
 
-1. Using a text editor, open the `mysql.yml` file you created earlier in the class.
+1. Using a text editor, open the `mysql.yml` file if you haven't already done so.
 2. Update the `Statefulset` definition. Add the following under the `volumes` section:
 ```yaml
 - name: "vol-drupal-db"
@@ -269,9 +271,6 @@ spec:
             - mountPath: "/config/drupal-db"
               name: "vol-drupal-db"
       volumes:
-        - name: "vol-mysql"
-          persistentVolumeClaim:
-            claimName: mysql
         - name: "vol-flightdeck-db"
           configMap:
             name: "mysql"
@@ -422,7 +421,7 @@ web-57dd9c55b-tgw6l   1/1     Running   0          28s
 
 ## Validate changes
 
-With everything done, we can now do the final check. Does Drupal have the right database credientials? Let's find out!
+With everything done, we can now do the final check. Does Drupal have the right database credientals? Let's find out!
 
 1. Using a web browser, visit the DigitalOcean web portal.
 2. Navigate to **Manage** &gt; **Networking** and open the **Load Balancers** tab.
