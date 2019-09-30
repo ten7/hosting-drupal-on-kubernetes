@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+data:
+  flight-deck-db.yml: |
+    mysql_databases:
+    - name: "drupal"
+    mysql_users:
+    - name: "drupal"
+      host: "%"
+      passwordFile: "/config/drupal-db/drupal-db-password.txt"
+      priv: "drupal.*:ALL"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: drupal
+data:
+  flight-deck-web.yml: |
+    MYSQL_NAME: "drupal"
+    MYSQL_USER: "drupal"
+    MYSQL_PASS_FILE: "/config/drupal-db/drupal-db-password.txt"

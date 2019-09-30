@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: ten7/flight-deck-drupal:latest
+          name: web
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: "vol-drupal-db"
+              mountPath: "/config/drupal-db"
+            - name: "vol-drupal-config"
+              mountPath: "/config/web"
+      volumes:
+      - name: "vol-drupal-db"
+        secret:
+          secretName: "drupal-db"
+      - name: "vol-drupal-config"
+        configMap:
+          name: "drupal"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    app: web
+  type: LoadBalancer
