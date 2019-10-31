@@ -122,7 +122,7 @@ web-5ddcb78d8-p5lqb   1/1     Running   0          19m
 
 ## Examine files
 
-At first, recreatng the pods seems like an excessive response to a configuration change. Yet, this is an intentional behavior. Pods are meant to be emphemeral. Even Statefulset pods should be designed to survive a pod being deleted and recreated. Let's examine the new web pod to see how our Secret is presented inside the pod:
+At first, re-creatng the pods seems like an excessive response to a configuration change. Yet, this is an intentional behavior. Pods are meant to be ephemeral. Even Statefulset pods should be designed to survive a pod being deleted and recreated. Let's examine the new web pod to see how our Secret is presented inside the pod:
 
 1. Examine the `web.yml` file. Notice that under `volumeMounts`, we mounted the Secret under `/config/drupal-db`.
 2. Return to the list of the pods in your cluster:
@@ -190,7 +190,7 @@ mysql   1      10s
 ```shell
 kubectl --kubeconfig="/path/to/kubeconfig.yml" edit configmap mysql
 ```
-8. Notice that you may edit the contents of the Configmap in plaintext.
+8. Notice that you may edit the contents of the Configmap in plain text.
 9. Close the editor.
 
 ## Add the configmap to mysql Statefulset
@@ -421,7 +421,7 @@ web-57dd9c55b-tgw6l   1/1     Running   0          28s
 
 ## Validate changes
 
-With everything done, we can now do the final check. Does Drupal have the right database credientals? Let's find out!
+With everything done, we can now do the final check. Does Drupal have the right database credentials? Let's find out!
 
 1. Using a web browser, visit the DigitalOcean web portal.
 2. Navigate to **Manage** &gt; **Networking** and open the **Load Balancers** tab.

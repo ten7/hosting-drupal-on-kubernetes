@@ -64,7 +64,7 @@ kubectl --kubeconfig="/path/to/kubeconfig.yml" describe deployment web
 
 ## Edit the deployment
 
-The `kubectl apply` command can be used multiple times against the same definitions; it doesn't need to only be used for creation. Sometimes, however, we need to modify a Kubernetes definition directly to make a critical change or to try out different configuration options to solve a problem. For this, we can use `kubectl edit`.
+The `kubectl apply` command can be used multiple times against the same definitions; it doesn't need to only be used for creation. Sometimes, however, we need to modify a Kubernetes definition directly to make a critical change or to try out different configuration options to solve a problem. This is sometimes called "hot editing". For this, we can use `kubectl edit`.
 
 1. Edit the Deployment definition (on Windows, this will open Notepad):
 ```shell

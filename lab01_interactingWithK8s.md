@@ -11,35 +11,22 @@ In this lab we'll:
 
 ## Installing kubectl
 
-There are several methods to install `kubectl` depending on your preference and platform. The [Kubernetes website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos) specifies several different methods with which you may install `kubectl`: 
+There are several methods to install `kubectl` depending on your preference and platform. The [Kubernetes website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos) specifies several different methods with which you may install `kubectl`:
 
 * Use a downloaded binary ("dist")
 * Use a package manager such as Homebrew or Chocolatey.
 * Install Docker for Mac or Docker for Windows.
 
-Your instructor may recommend a particular method depending on your class. 
+Your instructor may recommend a particular method depending on your class.
 
-Often, however, you will want to also install Docker so that you may build and run your containers locally. Docker for Mac and Docker for Windows include `kubectl` out of the box.
-
-On MacOS:
+The fastest method to start is to download the "dist". This contains a ready-to-use copy of `kubectl`. Even if you already have `kubectl` installed on your system, it may be an older, incompatible version. You can run the downloaded `kubectl` command locally without needing to install it system-wide.
 
 1. Open a web browser to the following address:
 ```
-https://hub.docker.com/editions/community/docker-ce-desktop-mac
+https://kubernetes.io/docs/tasks/tools/install-kubectl
 ```
-2. Click **Get Docker**.
-3. Install the application as you would any MacOS app.
-
-On Windows:
-
-1. Open a web browser to the following address:
-```
-https://hub.docker.com/editions/community/docker-ce-desktop-windows
-```
-2. Click **Get Docker**.
-3. Run the installer, following on-screen instructions.
-
-For Linux, typically you must install Docker and kubectl separately using your distribution's default package manager. Consult your distribution's documentation for instructions.
+2. Locate the installation instructions for your operating system on the page.
+3. Follow all steps for your OS.
 
 ## Create hosting provider account or login
 

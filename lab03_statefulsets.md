@@ -96,7 +96,7 @@ mysql-1                0/1     ContainerCreating   0          3s
 mysql-2                1/1     Running             0          5m11s
 web-56c74df886-gpf9c   1/1     Running             0          20h
 ```
-9. Notice that instead of creating a new pod, `mysql-3`, it recreates the original `mysql-1` pod in place. This is another key feature of Statefulsets.
+9. Notice that instead of creating a new pod (such as `mysql-3`), it recreates the original `mysql-1` pod in place. This is another key feature of Statefulsets.
 10. Finally, let's scale down the Statefulset to its original size of `1`. We can do this by using `kubectl edit`, or even `kubectl apply`, but we can also use another command:
 ```shell
 $ kubectl --kubeconfig="/path/to/kubeconfig.yml" scale statefulset/mysql --replicas=1
