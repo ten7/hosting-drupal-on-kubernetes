@@ -358,7 +358,7 @@ Now that we have a database backed by a persistent disk, we should be able to co
 
 1. Using a web browser, navigate to the IP address provided by the web portal.
 2. After a moment, you should be redirected to the Drupal installation page. Click `Save and Continue`.
-3. IMPORTANT: Choose the **Standard** profile. Other profiles download files locally which aren't part of the container, and won't be present when the you re-apply your Deployment.
+3. IMPORTANT: Choose the **Standard** profile. Other profiles download files locally which aren't part of the container, and won't be present when you re-apply your Deployment.
 4. Continue through the installation process until you reach the **Database configuration** page.
 4. For the **Database type** select **MySQL**.
 5. For the **Database name** enter `drupal`.
