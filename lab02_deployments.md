@@ -316,5 +316,5 @@ Everything is set, so we should be able to install Drupal, right? Let's see what
 1. Using a web browser, navigate to the IP address provided by the web portal.
 2. After a moment, you should be redirected to the Drupal installation page. Click `Save and Continue`.
 3. Continue through the installation process until you reach the *Set up database* page.
-
-Wait, we don't have a database! That's right, we could continue to install with SQLite, but it would be much better to have a MySQL database to power our site. We'll set that up in future labs.
+4. Wait, we don't have a database! While we could use SQLite, we'll set up a MySQL database in a future lab.
+5. Close the browser window.
